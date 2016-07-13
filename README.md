@@ -1,6 +1,6 @@
-# bibliophile
+# Bibliophile
 
-This will be fun.
+A word game imitating a fond one from childhood. This will be fun.
 
 ## Code Style
 
