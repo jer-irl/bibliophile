@@ -29,6 +29,10 @@
 			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ]	
 		];
 
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		var selection = {x : -9001, y : -9001};
+
 		// Adjancency logic
 		function isAdjacent( a, b ) {
 			return (	(a.x == b.x && a.y == b.y - 1) 		||
@@ -39,24 +43,29 @@
 						(a.x == b.x + 1 && a.y == b.y - 1)		);
 		}
 
-		function pickTile( cursorLocation ) {
-			// TODO: translate screen loaction to index in gameboard array
+		const boardX = 10;
+		const boardY = 10;
+		const tileWidth = 50;
+		const tileHeight = 50;
+		const tileSpace = 3;
+
+		function pickTile( x, y ) {
+			// Translates a board location to index in gameboard array
+			var i = Math.floor((x - boardX) / (tileWidth + tileSpace));
+			var j = Math.floor((y - (((tileHeight / 2) * (i % 2)) + boardY)) / (tileHeight + tileSpace));
+
+			return { x: i, y: j };
 		}
 
 		function renderBoard () {
 			// Draw a box with character for each tile
-			
-			const tileWidth = 50;
-			const tileHeight = 50;
-			const tileSpace = 3;
-
-			var c = document.getElementById("myCanvas");
-			var ctx = c.getContext("2d");
+			ctx.fillStyle = "8F3931";
+			ctx.fillRect(0, 0, c.width, c.height);
 
 			for (j = 0; j < 8; j++) {
 				for (i = 0; i < 7; i++) {
-			 		var x = i * (tileWidth + tileSpace) + 10;
-					var y = j * (tileHeight + tileSpace) + ((tileHeight / 2) * (i % 2)) + 10;
+			 		var x = i * (tileWidth + tileSpace) + boardX;
+					var y = j * (tileHeight + tileSpace) + ((tileHeight / 2) * (i % 2)) + boardY;
 			 		ctx.rect(x, y, tileWidth, tileHeight);
 					ctx.fillStyle="#800000";
 					ctx.fillRect(x, y, tileWidth, tileHeight);
@@ -67,13 +76,47 @@
 					var xOffset = (tileWidth - text.width) / 2;
 					var yOffset = (tileHeight - text.height) / 2;
 
-					ctx.fillText(gameboard[j][i],x + xOffset, y + 35);
+					ctx.fillText(gameboard[j][i], x + xOffset, y + 35);
 				}
+			}
+
+			if (selection.x > -1 && selection.y > -1) {
+				var x = selection.x * (tileWidth + tileSpace) + boardX;
+				var y = selection.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selection.x % 2)) + boardY;
+				ctx.fillStyle="#FFA319";
+				ctx.fillRect(x, y, tileWidth, tileHeight);
+				ctx.font="35px Garamond";
+				ctx.fillStyle="#000000";
+				var text = ctx.measureText(gameboard[selection.y][selection.x]);
+				var xOffset = (tileWidth - text.width) / 2;
+				var yOffset = (tileHeight - text.height) / 2;
+
+				ctx.fillText(gameboard[selection.y][selection.x], x + xOffset, y + 35);
 			}
 
 			ctx.stroke();
 		}
-		
+
+		function getMousePos(canvas, evt) {
+        	var rect = canvas.getBoundingClientRect();
+        	return {
+          		x: evt.clientX - rect.left,
+         		y: evt.clientY - rect.top
+        	};
+    	}
+
+		c.addEventListener('mouseup', function(evt) {
+        	var mousePos = getMousePos(c, evt);
+        	var selpos = pickTile(mousePos.x, mousePos.y);
+        	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
+        		selection = selpos;
+        	}
+        	else {
+        		selection = {x: -9001, y: -9001};
+        	}
+        	renderBoard();
+      	}, false);
+
 		renderBoard();
 	</script>
 
