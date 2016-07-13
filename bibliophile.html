@@ -1,12 +1,83 @@
 <html>
 <body>
-  <h1>Stuff</h1>
+	<h1>Stuff</h1>
 
-  <script>
-    alert "fite me nerd"
-  </script>
 
-  <h1>Done</h1>
+
+	<canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;">
+	</canvas>
+
+	<script>
+		// This and the following function allow us to generate random characters
+		const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+		// We'll want to weight this to keep things interesting, but it's unbiased right now
+		function randchar() {
+			return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+		}
+
+		// 8x8 array of initially random characters
+		// We'll need some way to ensure that there's always a word on the board
+		var gameboard = [
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
+			[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ]	
+		];
+
+		// Adjancency logic
+		function isAdjacent( a, b ) {
+			return (	(a.x == b.x && a.y == b.y - 1) 		||
+						(a.x == b.x && a.y == b.y + 1) 		||
+						(a.x == b.x - 1 && a.y == b.y) 		||
+						(a.x == b.x - 1 && a.y == b.y - 1) 	||
+						(a.x == b.x + 1 && a.y == b.y) 		||
+						(a.x == b.x + 1 && a.y == b.y - 1)		);
+		}
+
+		function pickTile( cursorLocation ) {
+			// TODO: translate screen loaction to index in gameboard array
+		}
+
+		function renderBoard () {
+			// Draw a box with character for each tile
+			
+			const tileWidth = 50;
+			const tileHeight = 50;
+			const tileSpace = 3;
+
+			var c = document.getElementById("myCanvas");
+			var ctx = c.getContext("2d");
+
+			for (j = 0; j < 8; j++) {
+				for (i = 0; i < 7; i++) {
+			 		var x = i * (tileWidth + tileSpace) + 10;
+					var y = j * (tileHeight + tileSpace) + ((tileHeight / 2) * (i % 2)) + 10;
+			 		ctx.rect(x, y, tileWidth, tileHeight);
+					ctx.fillStyle="#800000";
+					ctx.fillRect(x, y, tileWidth, tileHeight);
+					ctx.font="35px Garamond";
+					ctx.fillStyle="#000000";
+
+					var text = ctx.measureText(gameboard[j][i]);
+					var xOffset = (tileWidth - text.width) / 2;
+					var yOffset = (tileHeight - text.height) / 2;
+
+					ctx.fillText(gameboard[j][i],x + xOffset, y + 35);
+				}
+			}
+
+			ctx.stroke();
+		}
+		
+		renderBoard();
+	</script>
+
+	<h1>Done</h1>
 
 </body>
 </html>
