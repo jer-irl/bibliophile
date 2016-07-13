@@ -1,13 +1,27 @@
 <html>
+<head>
+	<script src="jquery-3.0.0.js"></script>
+</head>
 <body>
 	<h1>Stuff</h1>
-
-
 
 	<canvas id="myCanvas" width="500" height="500" style="border:1px solid #000000;">
 	</canvas>
 
 	<script>
+		// The dictionary lookup object
+		var dict = {};
+
+		$.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt ) {
+				// Get an array of all the words
+				var words = txt.split( "\n" );
+				// And add them as properties to the dictionary lookup
+				// This will allow for fast lookups later
+				for ( var i = 0; i < words.length; i++ ) { 
+					dict[ words[i] ] = true; 
+				}
+			});
+
 		// This and the following function allow us to generate random characters
 		const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -32,17 +46,42 @@
 		var c = document.getElementById("myCanvas");
 		var ctx = c.getContext("2d");
 		var selection = {x : -9001, y : -9001};
+		var selectionChain = [];
 
 		// Adjancency logic
+		// Trust me on this:
+		//
+		// Suppose a is in column 1. Then we have the following values for b:
+		//
+		// - + -
+		// + a +
+		// + + +
+		//
+		// In column 2, we have:
+		// + + +
+		// + a +
+		// - + -
+		// That said, here it is:
 		function isAdjacent( a, b ) {
-			return (	(a.x == b.x && a.y == b.y - 1) 		||
-						(a.x == b.x && a.y == b.y + 1) 		||
-						(a.x == b.x - 1 && a.y == b.y) 		||
-						(a.x == b.x - 1 && a.y == b.y - 1) 	||
-						(a.x == b.x + 1 && a.y == b.y) 		||
-						(a.x == b.x + 1 && a.y == b.y - 1)		);
+			if (a.x % 2 == 1) {
+				return (	(a.x == b.x && a.y == b.y - 1) 		||
+							(a.x == b.x && a.y == b.y + 1) 		||
+							(a.x == b.x - 1 && a.y == b.y) 		||
+							(a.x == b.x - 1 && a.y == b.y - 1) 	||
+							(a.x == b.x + 1 && a.y == b.y) 		||
+							(a.x == b.x + 1 && a.y == b.y - 1)		);	
+			}
+			else {
+				return (	(a.x == b.x && a.y == b.y - 1) 		||
+							(a.x == b.x && a.y == b.y + 1) 		||
+							(a.x == b.x - 1 && a.y == b.y) 		||
+							(a.x == b.x - 1 && a.y == b.y + 1) 	||
+							(a.x == b.x + 1 && a.y == b.y) 		||
+							(a.x == b.x + 1 && a.y == b.y + 1)		);
+			}
 		}
 
+		// Declare some constants
 		const boardX = 10;
 		const boardY = 10;
 		const tileWidth = 50;
@@ -80,21 +119,47 @@
 				}
 			}
 
+			// Draw the selection chain
 			if (selection.x > -1 && selection.y > -1) {
-				var x = selection.x * (tileWidth + tileSpace) + boardX;
-				var y = selection.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selection.x % 2)) + boardY;
+				var sx = selection.x * (tileWidth + tileSpace) + boardX;
+				var sy = selection.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selection.x % 2)) + boardY;
 				ctx.fillStyle="#FFA319";
-				ctx.fillRect(x, y, tileWidth, tileHeight);
+				ctx.fillRect(sx, sy, tileWidth, tileHeight);
 				ctx.font="35px Garamond";
 				ctx.fillStyle="#000000";
 				var text = ctx.measureText(gameboard[selection.y][selection.x]);
-				var xOffset = (tileWidth - text.width) / 2;
-				var yOffset = (tileHeight - text.height) / 2;
+				var sxOffset = (tileWidth - text.width) / 2;
+				var syOffset = (tileHeight - text.height) / 2;
+				ctx.fillText(gameboard[selection.y][selection.x], sx + sxOffset, sy + 35);
 
-				ctx.fillText(gameboard[selection.y][selection.x], x + xOffset, y + 35);
+				for (i = 0; i < selectionChain.length; i++) {
+					var x = selectionChain[i].x * (tileWidth + tileSpace) + boardX;
+					var y = selectionChain[i].y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selectionChain[i].x % 2)) + boardY;
+					ctx.fillStyle="#FFB547";
+					ctx.fillRect(x, y, tileWidth, tileHeight);
+					ctx.font="35px Garamond";
+					ctx.fillStyle="#000000";
+					var text = ctx.measureText(gameboard[selectionChain[i].y][selectionChain[i].x]);
+					var xOffset = (tileWidth - text.width) / 2;
+					var yOffset = (tileHeight - text.height) / 2;
+					ctx.fillText(gameboard[selectionChain[i].y][selectionChain[i].x], x + xOffset, y + 35);
+				}
 			}
 
 			ctx.stroke();
+		}
+
+		function checkIfWord() {
+			candidate = "" + gameboard[selection.y][selection.x];
+			for (i = 0; i < selectionChain.length; i++){
+				candidate += gameboard[selectionChain[i].y][selectionChain[i].x];
+			}
+			if (dict[candidate.toLowerCase()]) {
+				alert("You have formed the following Scrabble word: " + candidate.toLowerCase());
+			}
+			else {
+				alert("The following is not a Scrabble word: " + candidate.toLowerCase());
+			}
 		}
 
 		function getMousePos(canvas, evt) {
@@ -109,13 +174,45 @@
         	var mousePos = getMousePos(c, evt);
         	var selpos = pickTile(mousePos.x, mousePos.y);
         	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
-        		selection = selpos;
+        		// Aaaaargh
+        		if (selectionChain.length == 0) {
+        			if (selection.x == selpos.x && selection.y == selpos.y) {
+        				selection = selpos;
+        				selectionChain = [];
+        			}
+        			else if (isAdjacent(selpos, selection)) {
+        				selectionChain.push({x: selpos.x, y : selpos.y});
+        			}
+        			else {
+        				//alert("(" + selpos.x + ", " + selpos.y + ") is allegedly not adjacent to the selection at (" + selection.x + ", " + selection.y + ").");
+        				selection = selpos;
+        				selectionChain = [];
+        			}
+        		}
+        		else {
+        			if (selection.x == selpos.x && selection.y == selpos.y) {
+        				selection = selpos;
+        				selectionChain = [];
+        			}
+        			else if (isAdjacent(selpos, selectionChain[selectionChain.length - 1])) {
+        				selectionChain.push({x: selpos.x, y : selpos.y});
+
+        				checkIfWord();
+        			}
+        			else {
+        				//alert("(" + selpos.x + ", " + selpos.y + ") is allegedly not adjacent to the selection at (" + selectionChain[selectionChain.length - 1].x + ", " + selectionChain[selectionChain.length - 1].y + ").");
+        				selection = selpos;
+        				selectionChain = [];
+        			}
+        		}
         	}
         	else {
         		selection = {x: -9001, y: -9001};
         	}
         	renderBoard();
       	}, false);
+
+		
 
 		renderBoard();
 	</script>
