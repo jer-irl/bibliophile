@@ -97,10 +97,10 @@
 		}
 
 		function renderBoard () {
-			// Draw a box with character for each tile
-			ctx.fillStyle = "8F3931";
+			ctx.fillStyle="#8F3931";
 			ctx.fillRect(0, 0, c.width, c.height);
 
+			// Draw a box with character for each tile
 			for (j = 0; j < 8; j++) {
 				for (i = 0; i < 7; i++) {
 			 		var x = i * (tileWidth + tileSpace) + boardX;
