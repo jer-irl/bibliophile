@@ -12,7 +12,21 @@ A word game imitating a fond one from childhood. This will be fun.
 
 ## TODO
 
-### Wishlist
+### Features Wishlist
+
+- Quadratic falling animation
+- Ban two-letter words
+- Weighted random character machine
+- Scoring procedure
+- Display score, possibly previous words
+- Annoying mascot?
+- Bonus tiles
+- Flame tiles
+- Frivolous animations
+- Non-pixelly fullscreen mode
+
+### Pedantry Wishlist
+
 - function isWord(string) -> Boolean
 - function scoreForWord(string) -> Int
 - function isValidSelection(tile) -> Boolean
