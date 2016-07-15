@@ -64,19 +64,19 @@
 		// That said, here it is:
 		function isAdjacent( a, b ) {
 			if (a.x % 2 == 1) {
-				return (	(a.x == b.x && a.y == b.y - 1) 		||
-							(a.x == b.x && a.y == b.y + 1) 		||
-							(a.x == b.x - 1 && a.y == b.y) 		||
-							(a.x == b.x - 1 && a.y == b.y - 1) 	||
-							(a.x == b.x + 1 && a.y == b.y) 		||
+				return (	(a.x == b.x && a.y == b.y - 1)		||
+							(a.x == b.x && a.y == b.y + 1)		||
+							(a.x == b.x - 1 && a.y == b.y)		||
+							(a.x == b.x - 1 && a.y == b.y - 1)	||
+							(a.x == b.x + 1 && a.y == b.y)		||
 							(a.x == b.x + 1 && a.y == b.y - 1)		);	
 			}
 			else {
-				return (	(a.x == b.x && a.y == b.y - 1) 		||
-							(a.x == b.x && a.y == b.y + 1) 		||
-							(a.x == b.x - 1 && a.y == b.y) 		||
-							(a.x == b.x - 1 && a.y == b.y + 1) 	||
-							(a.x == b.x + 1 && a.y == b.y) 		||
+				return (	(a.x == b.x && a.y == b.y - 1)		||
+							(a.x == b.x && a.y == b.y + 1)		||
+							(a.x == b.x - 1 && a.y == b.y)		||
+							(a.x == b.x - 1 && a.y == b.y + 1)	||
+							(a.x == b.x + 1 && a.y == b.y)		||
 							(a.x == b.x + 1 && a.y == b.y + 1)		);
 			}
 		}
@@ -118,7 +118,7 @@
 			// Draw a box with character for each tile
 			for (j = 0; j < 8; j++) {
 				for (i = 0; i < 7; i++) {
-			 		drawTile({x: i, y: j}, "#800000");
+					drawTile({x: i, y: j}, "#800000");
 				}
 			}
 
@@ -203,7 +203,7 @@
 					var colIndex = nextSelectedTileInColumn();
 
 					// If there's a selected tile in the column, remove it from the list of selected tiles
-					cleanUp(i, 	colIndex);
+					cleanUp(i,	colIndex);
 
 					// Move the column down as long as there remain instances of the chain in it
 					while (colIndex > -1) {
@@ -237,85 +237,85 @@
 		}
 
 		function getMousePos(canvas, evt) {
-        	var rect = canvas.getBoundingClientRect();
-        	return {
-          		x: evt.clientX - rect.left,
-         		y: evt.clientY - rect.top
-        	};
-    	}
+			var rect = canvas.getBoundingClientRect();
+			return {
+				x: evt.clientX - rect.left,
+				y: evt.clientY - rect.top
+			};
+		}
 
 		c.addEventListener('mouseup', function(evt) {
-        	var mousePos = getMousePos(c, evt);
-        	var selpos = pickTile(mousePos.x, mousePos.y);
-        	// If we're on the gamemboard itself
-        	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
-        		// If there's no chain of selected tiles
-        		if (selectionChain.length == 0) {
-        			// Clicking the selection does nothing
-        			if (selection.x == selpos.x && selection.y == selpos.y) {
-        				selection = selpos;
-        				selectionChain = [];
-        			}
-        			// Clicking adjacent to the selection adds to the chain
-        			else if (isAdjacent(selpos, selection)) {
-        				selectionChain.push({x: selpos.x, y : selpos.y});
-        			}
-        			// Clicking elsewhere moves the selection
-        			else {
-        				selection = selpos;
-        				selectionChain = [];
-        			}
-        		}
-        		// If there is a chain of selected tiles
-        		else {
-        			// Clicking the selection kills the chain
-        			if (selection.x == selpos.x && selection.y == selpos.y) {
-        				selection = selpos;
-        				selectionChain = [];
-        			}
-        			// If we didn't click on the selection, determine if we clicked on a tile in the chain
-        			else
-        			{
-        				var collides = false;
+			var mousePos = getMousePos(c, evt);
+			var selpos = pickTile(mousePos.x, mousePos.y);
+			// If we're on the gamemboard itself
+			if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
+				// If there's no chain of selected tiles
+				if (selectionChain.length == 0) {
+					// Clicking the selection does nothing
+					if (selection.x == selpos.x && selection.y == selpos.y) {
+						selection = selpos;
+						selectionChain = [];
+					}
+					// Clicking adjacent to the selection adds to the chain
+					else if (isAdjacent(selpos, selection)) {
+						selectionChain.push({x: selpos.x, y : selpos.y});
+					}
+					// Clicking elsewhere moves the selection
+					else {
+						selection = selpos;
+						selectionChain = [];
+					}
+				}
+				// If there is a chain of selected tiles
+				else {
+					// Clicking the selection kills the chain
+					if (selection.x == selpos.x && selection.y == selpos.y) {
+						selection = selpos;
+						selectionChain = [];
+					}
+					// If we didn't click on the selection, determine if we clicked on a tile in the chain
+					else
+					{
+						var collides = false;
 
-        				// For each tile, check
-        				for (i = 0; i < selectionChain.length - 1 && !collides; i++) {
-        					// If we did hit it, delete from the chain all tiles ahead of the selected one
-        					if (selpos.x == selectionChain[i].x && selpos.y == selectionChain[i].y) {
-        						var k = selectionChain.length - i - 1;
-        						for (j = 0; j < k; j++){
-        							selectionChain.pop();
-        						}
-        						collides = true;
-        					}
-        				}
+						// For each tile, check
+						for (i = 0; i < selectionChain.length - 1 && !collides; i++) {
+							// If we did hit it, delete from the chain all tiles ahead of the selected one
+							if (selpos.x == selectionChain[i].x && selpos.y == selectionChain[i].y) {
+								var k = selectionChain.length - i - 1;
+								for (j = 0; j < k; j++){
+									selectionChain.pop();
+								}
+								collides = true;
+							}
+						}
 
-        				// If we didn't collide with the chain, proceed
-        				if (!collides) {
-	        				// If we clicked on the last member of the chain, determine if we can submit the word
-	        				if (isWord() && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
-	        					adjustGameboard();
-	        				}     					
-        					// If we clicked adjacent the most recent member of the chain, add to it
-        					else if (isAdjacent(selpos, selectionChain[selectionChain.length - 1])) {
-        						selectionChain.push({x: selpos.x, y : selpos.y});
-        					}
-        					// Otherwise, kill the chain and move the selection
-        					else {
-		        				selection = selpos;
-		        				selectionChain = [];
-		        			}
-        				}
-        			}
-        		}
-        	}
-        	// If we clicked outside the gameboard, then don't render a selected tile
-        	else {
-        		selection = {x: -9001, y: -9001};
-        	}
+						// If we didn't collide with the chain, proceed
+						if (!collides) {
+							// If we clicked on the last member of the chain, determine if we can submit the word
+							if (isWord() && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
+								adjustGameboard();
+							}						
+							// If we clicked adjacent the most recent member of the chain, add to it
+							else if (isAdjacent(selpos, selectionChain[selectionChain.length - 1])) {
+								selectionChain.push({x: selpos.x, y : selpos.y});
+							}
+							// Otherwise, kill the chain and move the selection
+							else {
+								selection = selpos;
+								selectionChain = [];
+							}
+						}
+					}
+				}
+			}
+			// If we clicked outside the gameboard, then don't render a selected tile
+			else {
+				selection = {x: -9001, y: -9001};
+			}
 
-        	renderBoard();
-      	}, false);
+			renderBoard();
+		}, false);
 
 		renderBoard();
 	</script>
