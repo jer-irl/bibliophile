@@ -9,7 +9,7 @@ Yeah, it's written in JavaScript. Download the most recent development version o
 ## Code Style
 
 - Tabs for indentation
-    - Spaces to align arguments
+	- Spaces to align arguments
 - Braces in [1TBS style](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS)
 - CamelCase preferred
 - Otherwise, follow [airbnb's style guide](https://github.com/airbnb/javascript)
@@ -33,6 +33,6 @@ Yeah, it's written in JavaScript. Download the most recent development version o
 
 - function scoreForWord(string) -> Int
 - Class Board
-    - Generate new
-    - reset after word input
+	- Generate new
+	- reset after word input
 - Assets
