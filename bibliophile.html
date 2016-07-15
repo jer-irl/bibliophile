@@ -96,6 +96,21 @@
 			return { x: i, y: j };
 		}
 
+		function drawTile (location, color) {
+			var x = location.x * (tileWidth + tileSpace) + boardX;
+			var y = location.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (location.x % 2)) + boardY;
+			ctx.fillStyle=color;
+			ctx.fillRect(x, y, tileWidth, tileHeight);
+			ctx.font="35px Garamond";
+			ctx.fillStyle="#000000";
+			ctx.rect(x, y, tileWidth, tileHeight);
+			var text = ctx.measureText(gameboard[location.y][location.x]);
+			var xOffset = (tileWidth - text.width) / 2;
+			var yOffset = (tileHeight - text.height) / 2;
+
+			ctx.fillText(gameboard[location.y][location.x], x + xOffset, y + 35);
+		}
+
 		function renderBoard () {
 			ctx.fillStyle="#8F3931";
 			ctx.fillRect(0, 0, c.width, c.height);
@@ -103,45 +118,17 @@
 			// Draw a box with character for each tile
 			for (j = 0; j < 8; j++) {
 				for (i = 0; i < 7; i++) {
-			 		var x = i * (tileWidth + tileSpace) + boardX;
-					var y = j * (tileHeight + tileSpace) + ((tileHeight / 2) * (i % 2)) + boardY;
-					ctx.fillStyle="#800000";
-					ctx.fillRect(x, y, tileWidth, tileHeight);
-					ctx.font="35px Garamond";
-					ctx.fillStyle="#000000";
-					ctx.rect(x, y, tileWidth, tileHeight);
-					var text = ctx.measureText(gameboard[j][i]);
-					var xOffset = (tileWidth - text.width) / 2;
-					var yOffset = (tileHeight - text.height) / 2;
-
-					ctx.fillText(gameboard[j][i], x + xOffset, y + 35);
+			 		drawTile({x: i, y: j}, "#800000");
 				}
 			}
 
 			// Draw the selection chain
 			if (selection.x > -1 && selection.y > -1) {
-				var sx = selection.x * (tileWidth + tileSpace) + boardX;
-				var sy = selection.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selection.x % 2)) + boardY;
-				ctx.fillStyle="#FFA319";
-				ctx.fillRect(sx, sy, tileWidth, tileHeight);
-				ctx.font="35px Garamond";
-				ctx.fillStyle="#000000";
-				var text = ctx.measureText(gameboard[selection.y][selection.x]);
-				var sxOffset = (tileWidth - text.width) / 2;
-				var syOffset = (tileHeight - text.height) / 2;
-				ctx.fillText(gameboard[selection.y][selection.x], sx + sxOffset, sy + 35);
-
+				// First the head
+				drawTile(selection, "#FFA319");
+				// Then each member of the list
 				for (i = 0; i < selectionChain.length; i++) {
-					var x = selectionChain[i].x * (tileWidth + tileSpace) + boardX;
-					var y = selectionChain[i].y * (tileHeight + tileSpace) + ((tileHeight / 2) * (selectionChain[i].x % 2)) + boardY;
-					ctx.fillStyle="#FFB547";
-					ctx.fillRect(x, y, tileWidth, tileHeight);
-					ctx.font="35px Garamond";
-					ctx.fillStyle="#000000";
-					var text = ctx.measureText(gameboard[selectionChain[i].y][selectionChain[i].x]);
-					var xOffset = (tileWidth - text.width) / 2;
-					var yOffset = (tileHeight - text.height) / 2;
-					ctx.fillText(gameboard[selectionChain[i].y][selectionChain[i].x], x + xOffset, y + 35);
+					drawTile(selectionChain[i], "#FFB547");
 				}
 			}
 
