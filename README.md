@@ -2,6 +2,10 @@
 
 A word game imitating a fond one from childhood. This will be fun.
 
+## Running the Game
+
+Yeah, it's written in JavaScript. Download the most recent development version of jQuery and put it in the same folder you clone the repository to and it should run.
+
 ## Code Style
 
 - Tabs for indentation
@@ -27,13 +31,8 @@ A word game imitating a fond one from childhood. This will be fun.
 
 ### Pedantry Wishlist
 
-- function isWord(string) -> Boolean
 - function scoreForWord(string) -> Int
-- function isValidSelection(tile) -> Boolean
-    - Adjacent?
-    - Unused letter?
 - Class Board
     - Generate new
     - reset after word input
-- Animations
 - Assets
