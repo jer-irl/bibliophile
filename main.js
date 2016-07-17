@@ -1,3 +1,5 @@
+'use strict';
+
 // The dictionary lookup object
 var dict = {};
 
@@ -6,13 +8,13 @@ $.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt )
 		var words = txt.split( "\n" );
 		// And add them as properties to the dictionary lookup
 		// This will allow for fast lookups later
-		for ( var i = 0; i < words.length; i++ ) { 
-			dict[ words[i] ] = true; 
+		for ( var i = 0; i < words.length; i++ ) {
+			dict[ words[i] ] = true;
 		}
 	});
 
 // This and the following function allow us to generate random characters
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // We'll want to weight this to keep things interesting, but it's unbiased right now
 function randchar() {
@@ -29,7 +31,7 @@ var gameboard = [
 	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
 	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
 	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ]	
+	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ]
 ];
 
 var c = document.getElementById("myCanvas");
@@ -107,8 +109,8 @@ function renderBoard () {
 	ctx.fillRect(0, 0, c.width, c.height);
 
 	// Draw a box with character for each tile
-	for (j = 0; j < 8; j++) {
-		for (i = 0; i < 7; i++) {
+	for (var j = 0; j < 8; j++) {
+		for (var i = 0; i < 7; i++) {
 			drawTile({x: i, y: j}, "#800000");
 		}
 	}
@@ -118,7 +120,7 @@ function renderBoard () {
 		// First the head
 		drawTile(selection, "#FFA319");
 		// Then each member of the list
-		for (i = 0; i < selectionChain.length; i++) {
+		for (var i = 0; i < selectionChain.length; i++) {
 			drawTile(selectionChain[i], "#FFB547");
 		}
 	}
@@ -127,10 +129,10 @@ function renderBoard () {
 }
 
 // Returns the index in the column of the next selected tile, and -1 if the column contains none
-function nextSelectedTileInColumn() {
+function nextSelectedTileInColumn(i) {
 	var colIndex = -1;
 
-	for (j = 0; j < 8 && colIndex < 0; j++) {
+	for (var j = 0; j < 8 && colIndex < 0; j++) {
 		// Check if it's the selection
 		if (selection.x == i && selection.y == j) {
 			colIndex = j;
@@ -138,7 +140,7 @@ function nextSelectedTileInColumn() {
 		}
 		// Check if it's in the chain of selected tiles
 		else {
-			for (k = 0; k < selectionChain.length && colIndex < 0; k++)
+			for (var k = 0; k < selectionChain.length && colIndex < 0; k++)
 			{
 				if (selectionChain[k].x == i && selectionChain[k].y == j) {
 					colIndex = j;
@@ -152,7 +154,7 @@ function nextSelectedTileInColumn() {
 // Gets the index of the (i, j)th tile within the chain of selected tiles
 function getChainIndex(i, j) {
 	var chainIndex = -1;
-	for (k = 0; k < selectionChain.length && chainIndex < 0; k++) {
+	for (var k = 0; k < selectionChain.length && chainIndex < 0; k++) {
 		if (selectionChain[k].x == i && selectionChain[k].y == j) {
 			chainIndex = k;
 		}
@@ -177,28 +179,28 @@ function cleanUp(i, j) {
 
 function adjustGameboard() {
 	// Get the list of columns hit by the chain
-	columns = [false, false, false, false, false, false, false];
+	var columns = [false, false, false, false, false, false, false];
 
-	for (i = 0; i < selectionChain.length; i++) {
+	for (var i = 0; i < selectionChain.length; i++) {
 		columns[selectionChain[i].x] = true;
 	}
 	columns[selection.x] = true;
 
 	// For each column
-	for (i = 0; i < columns.length; i++) {
+	for (var i = 0; i < columns.length; i++) {
 		if (columns[i])
 		{
 			//alert("Checking column " + i);
 
 			// Find the next instance in the column
-			var colIndex = nextSelectedTileInColumn();
+			var colIndex = nextSelectedTileInColumn(i);
 
 			// If there's a selected tile in the column, remove it from the list of selected tiles
 			cleanUp(i,	colIndex);
 
 			// Move the column down as long as there remain instances of the chain in it
 			while (colIndex > -1) {
-				for (j = colIndex; j > 0; j--) {
+				for (var j = colIndex; j > 0; j--) {
 					//alert("Replacing " + gameboard[j][i] + " at (" + i + ", " + j + ") with " + gameboard[j - 1][i]);
 					gameboard[j][i] = gameboard[j - 1][i];
 				}
@@ -220,8 +222,8 @@ function adjustGameboard() {
 }
 
 function isWord() {
-	candidate = "" + gameboard[selection.y][selection.x];
-	for (i = 0; i < selectionChain.length; i++){
+	var candidate = "" + gameboard[selection.y][selection.x];
+	for (var i = 0; i < selectionChain.length; i++){
 		candidate += gameboard[selectionChain[i].y][selectionChain[i].x];
 	}
 	return dict[candidate.toLowerCase()];
@@ -270,7 +272,7 @@ c.addEventListener('mouseup', function(evt) {
 				var collides = false;
 
 				// For each tile, check
-				for (i = 0; i < selectionChain.length - 1 && !collides; i++) {
+				for (var i = 0; i < selectionChain.length - 1 && !collides; i++) {
 					// If we did hit it, delete from the chain all tiles ahead of the selected one
 					if (selpos.x == selectionChain[i].x && selpos.y == selectionChain[i].y) {
 						var k = selectionChain.length - i - 1;
