@@ -1,3 +1,4 @@
+// Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
 // The dictionary lookup object
@@ -14,64 +15,51 @@ $.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt )
 	});
 
 // This and the following function allow us to generate random characters
-let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // We'll want to weight this to keep things interesting, but it's unbiased right now
 function randchar() {
 	return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
 }
 
-// 8x8 array of initially random characters
+// 8x7 array of initially random characters
 // we'll need some way to ensure that there's always a word on the board
-var gameboard = [
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ],
-	[ randchar(), randchar(), randchar(), randchar(), randchar(), randchar(), randchar() ]
-];
+var gameboard = new Array();
+for (var j = 0; j < 8; j++) {
+	var row = new Array(7).fill(null).map(randchar);
+	gameboard.push(row);
+}
 
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 var selection = {x : -9001, y : -9001};
 var selectionChain = [];
 
-/* adjancency logic
- * trust me on this:
- *
- * Suppose a is in column 1. Then we have the following values for b:
- *
- * - + -
- * + a +
- * + + +
- *
- * In column 2, we have:
- * + + +
- * + a +
- * - + -
- * That said, here it is:
- */
 
-function isAdjacent( a, b ) {
+function isAdjacent(a, b) {
+	/* returns true if adjacent
+	 *
+	 * Suppose a is in column 1. Then we have the following values for b:
+	 * - + -
+	 * + a +
+	 * + + +
+	 *
+	 * In column 2, we have:
+	 * + + +
+	 * + a +
+	 * - + -
+	 */
+
+	var columnSpecific;
 	if (a.x % 2 == 1) {
-		return (	(a.x == b.x && a.y == b.y - 1)		||
-					(a.x == b.x && a.y == b.y + 1)		||
-					(a.x == b.x - 1 && a.y == b.y)		||
-					(a.x == b.x - 1 && a.y == b.y - 1)	||
-					(a.x == b.x + 1 && a.y == b.y)		||
-					(a.x == b.x + 1 && a.y == b.y - 1)		);
+		columnSpecific = (a.y == b.y - 1 && 1 == Math.abs(a.x - b.x));
+	} else {
+		columnSpecific = (a.y == b.y + 1 && 1 == Math.abs(a.x - b.x));
 	}
-	else {
-		return (	(a.x == b.x && a.y == b.y - 1)		||
-					(a.x == b.x && a.y == b.y + 1)		||
-					(a.x == b.x - 1 && a.y == b.y)		||
-					(a.x == b.x - 1 && a.y == b.y + 1)	||
-					(a.x == b.x + 1 && a.y == b.y)		||
-					(a.x == b.x + 1 && a.y == b.y + 1)		);
-	}
+
+	return ((a.x == b.x && 1 == Math.abs(a.y - b.y)) ||
+			(a.y == b.y && 1 == Math.abs(a.x - b.x)) ||
+			columnSpecific);
 }
 
 // Declare some constants
