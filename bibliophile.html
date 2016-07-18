@@ -1,6 +1,12 @@
 <html>
 <head>
+	<!-- We have several options for imports.  We can use something like RequireJS, which is really gross.  Starting with ECMAscript 2015, there is also language-level support for modules.  However, it isn't implemented in browsers, so we'd need to run the code through a tool like babel to convert it.  This adds another degree of separation for debugging.  I recommend that for now we just include files inline like below. -->
+
+	<!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+
+	<!-- isWord(string) -> boolean -->
+	<script src="isWord.js"></script>
 </head>
 <body>
 	<h1>Stuff</h1>

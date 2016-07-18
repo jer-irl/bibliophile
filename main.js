@@ -1,18 +1,7 @@
+
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-// The dictionary lookup object
-var dict = {};
-
-$.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt ) {
-		// Get an array of all the words
-		var words = txt.split( "\n" );
-		// And add them as properties to the dictionary lookup
-		// This will allow for fast lookups later
-		for ( var i = 0; i < words.length; i++ ) {
-			dict[ words[i] ] = true;
-		}
-	});
 
 // This and the following function allow us to generate random characters
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -72,7 +61,8 @@ const tileSpace = 3;
 function pickTile( x, y ) {
 	// Translates a board location to index in gameboard array
 	var i = Math.floor((x - boardX) / (tileWidth + tileSpace));
-	var j = Math.floor((y - (((tileHeight / 2) * (i % 2)) + boardY)) / (tileHeight + tileSpace));
+	var j = Math.floor((y - (((tileHeight / 2) * (i % 2)) + boardY))
+	                   / (tileHeight + tileSpace));
 
 	return { x: i, y: j };
 }
@@ -209,12 +199,12 @@ function adjustGameboard() {
 	selectionChain = [];
 }
 
-function isWord() {
+function selectedWord() {
 	var candidate = "" + gameboard[selection.y][selection.x];
 	for (var i = 0; i < selectionChain.length; i++){
 		candidate += gameboard[selectionChain[i].y][selectionChain[i].x];
 	}
-	return dict[candidate.toLowerCase()];
+	return candidate;
 }
 
 function getMousePos(canvas, evt) {
@@ -274,7 +264,7 @@ function clickResponse(evt) {
 				// If we didn't collide with the chain, proceed
 				if (!collides) {
 					// If we clicked on the last member of the chain, determine if we can submit the word
-					if (isWord() && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
+					if (isWord(selectedWord()) && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
 						adjustGameboard();
 					}
 					// If we clicked adjacent the most recent member of the chain, add to it
