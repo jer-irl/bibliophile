@@ -26,7 +26,7 @@ function randchar() {
 // we'll need some way to ensure that there's always a word on the board
 var gameboard = new Array();
 for (var j = 0; j < 8; j++) {
-	var row = new Array(7).fill(null).map(randchar);
+	var row = new Array(7).fill(undefined).map(randchar);
 	gameboard.push(row);
 }
 
@@ -225,7 +225,7 @@ function getMousePos(canvas, evt) {
 	};
 }
 
-c.addEventListener('mouseup', function(evt) {
+function clickResponse(evt) {
 	var mousePos = getMousePos(c, evt);
 	var selpos = pickTile(mousePos.x, mousePos.y);
 	// If we're on the gamemboard itself
@@ -296,6 +296,12 @@ c.addEventListener('mouseup', function(evt) {
 	}
 
 	renderBoard();
-}, false);
+}
+
+c.addEventListener('mouseup', clickResponse, false);
+
+
 
 renderBoard();
+
+
