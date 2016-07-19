@@ -181,37 +181,30 @@ function boardClicked(selpos) {
 		// If we didn't click on the selection, determine if we clicked on a tile in the chain
 		else
 		{
-			var collides = false;
-
-			// For each tile, check
-			for (var i = 0; i < gameState.selectionChain.length - 1 && !collides; i++) {
-				// If we did hit it, delete from the chain all tiles ahead of the selected one
-				if (selpos.x == gameState.selectionChain[i].x && selpos.y == gameState.selectionChain[i].y) {
-					var k = gameState.selectionChain.length - i - 1;
-					for (j = 0; j < k; j++){
-						gameState.selectionChain.pop();
-					}
-					collides = true;
+			// Collision Handling
+			var collides = gameState.selectionCollides(selpos);
+			if (collides) {
+				while (gameState.selectionCollides(selpos)) {
+					gameState.popFromSelectionChain(1);
 				}
+				return;
 			}
 
-			// If we didn't collide with the chain, proceed
-			if (!collides) {
-				// If we clicked on the last member of the chain, determine if we can submit the word
-				if (isWord(selectedWord()) && selpos.x == gameState.selectionChain[gameState.selectionChain.length - 1].x && selpos.y == gameState.selectionChain[gameState.selectionChain.length - 1].y) {
-					showWord(selectedWord());
-					gameState.addSubmittedWord(selectedWord());
-					adjustGameboard();
-				}
-				// If we clicked adjacent the most recent member of the chain, add to it
-				else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
-					gameState.selectionChain.push({x: selpos.x, y : selpos.y});
-				}
-				// Otherwise, kill the chain and move the selection
-				else {
-					gameState.selection = selpos;
-					gameState.selectionChain = [];
-				}
+			// No Collision
+			// If we clicked on the last member of the chain, determine if we can submit the word
+			if (isWord(selectedWord()) && selpos.x == gameState.selectionChain[gameState.selectionChain.length - 1].x && selpos.y == gameState.selectionChain[gameState.selectionChain.length - 1].y) {
+				showWord(selectedWord());
+				gameState.addSubmittedWord(selectedWord());
+				adjustGameboard();
+			}
+			// If we clicked adjacent the most recent member of the chain, add to it
+			else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
+				gameState.selectionChain.push({x: selpos.x, y : selpos.y});
+			}
+			// Otherwise, kill the chain and move the selection
+			else {
+				gameState.clearSelection();
+				gameState.selection = selpos;
 			}
 		}
 	}
@@ -264,7 +257,33 @@ function GameState() {
 	this.submittedWords = [];
 	this.wordQualityIndex = 0;
 
-	// Methods
+	// Readonly Methods
+	this.selectionCollides = function(selpos) {
+		var collides = false;
+
+		// For each tile, check
+		for (var i = 0; i < this.selectionChain.length - 1; i++) {
+			// If we did hit it, delete from the chain all tiles ahead of the selected one
+			if (selpos.x == this.selectionChain[i].x && selpos.y == this.selectionChain[i].y) {
+				collides = true;
+				break;
+			}
+		}
+		return collides;
+	}
+
+	// Mutating Methods
+	this.popFromSelectionChain = function(n) {
+		var k = this.selectionChain.length - n - 1;
+		for (var j = 0; j < k; j++){
+			this.selectionChain.pop();
+		}
+	}
+
+	this.clearSelection = function() {
+		this.selection = {x: -9001, y: -9001};
+		this.selectionChain = [];
+	}
 	this.shuffleBoard = function() {
 		// TODO
 		return;
