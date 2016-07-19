@@ -1,8 +1,6 @@
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-
-
 function drawTile (location, color) {
 	var tileWidth = Globals.tileWidth;
 	var tileHeight = Globals.tileHeight;
@@ -35,14 +33,15 @@ function renderBoard () {
 		}
 	}
 
-	// Draw the selection chain
-	if (gameState.selection.x > -1 && gameState.selection.y > -1) {
-		// First the head
-		drawTile(gameState.selection, "#FFA319");
-		// Then each member of the list
-		for (var i = 0; i < gameState.selectionChain.length; i++) {
-			drawTile(gameState.selectionChain[i], "#FFB547");
+	// Draw the selection chain (or don't if empty)
+	for (var i = 0; i < gameState.selectionChain.length; i++) {
+		// Special case for first to please James
+		if (i == 0) {
+			drawTile(gameState.selectionChain[0], "#FFA319");
+			continue;
 		}
+		// All non-first tiles:
+		drawTile(gameState.selectionChain[i], "#FFB547");
 	}
 
 	Globals.ctx.stroke();
@@ -53,19 +52,12 @@ function renderBoard () {
 function nextSelectedTileInColumn(i) {
 	var colIndex = -1;
 
+	// For each column:
 	for (var j = 0; j < 8 && colIndex < 0; j++) {
-		// Check if it's the selection
-		if (gameState.selection.x == i && gameState.selection.y == j) {
-			colIndex = j;
-			//alert("Found the selection at (" + i + ", j" + ").");
-		}
 		// Check if it's in the chain of selected tiles
-		else {
-			for (var k = 0; k < gameState.selectionChain.length && colIndex < 0; k++)
-			{
-				if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
-					colIndex = j;
-				}
+		for (var k = 0; k < gameState.selectionChain.length && colIndex < 0; k++) {
+			if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
+				colIndex = j;
 			}
 		}
 	}
@@ -74,10 +66,10 @@ function nextSelectedTileInColumn(i) {
 
 // Gets the index of the (i, j)th tile within the chain of selected tiles
 function getChainIndex(i, j) {
-	var chainIndex = -1;
-	for (var k = 0; k < gameState.selectionChain.length && chainIndex < 0; k++) {
+	for (var k = 0; k < gameState.selectionChain.length; k++) {
 		if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
-			chainIndex = k;
+			var chainIndex = k;
+			break;
 		}
 	}
 	return chainIndex;
@@ -90,8 +82,7 @@ function cleanUp(i, j) {
 			gameState.selectionChain.splice(chainIndex, 1);
 		}
 		else {
-			gameState.selection.x = -9001;
-			gameState.selection.y = -9001;
+			gameState.clearSelectionChain();
 		}
 	}
 }
@@ -103,7 +94,6 @@ function adjustGameboard() {
 	for (var i = 0; i < gameState.selectionChain.length; i++) {
 		columns[gameState.selectionChain[i].x] = true;
 	}
-	columns[gameState.selection.x] = true;
 
 	// For each column
 	for (var i = 0; i < columns.length; i++) {
@@ -120,7 +110,7 @@ function adjustGameboard() {
 					//alert("Replacing " + gameboard[j][i] + " at (" + i + ", " + j + ") with " + gameboard[j - 1][i]);
 					gameState.gameboard[j][i] = gameState.gameboard[j - 1][i];
 				}
-				gameState.gameboard[0][i] = randchar();
+				gameState.gameboard[0][i] = weightedChar();
 
 				// Reset and look for another instance
 				colIndex = nextSelectedTileInColumn();
@@ -133,17 +123,9 @@ function adjustGameboard() {
 	}
 
 	// For good measure
-	gameState.selection = {x: -9001, y: -9001};
-	gameState.selectionChain = [];
+	gameState.clearSelectionChain();
 }
 
-function selectedWord() {
-	var candidate = "" + gameState.gameboard[gameState.selection.y][gameState.selection.x];
-	for (var i = 0; i < gameState.selectionChain.length; i++){
-		candidate += gameState.gameboard[gameState.selectionChain[i].y][gameState.selectionChain[i].x];
-	}
-	return candidate;
-}
 
 function getMousePos(canvas, evt) {
 	var rect = canvas.getBoundingClientRect();
@@ -154,61 +136,48 @@ function getMousePos(canvas, evt) {
 }
 
 function boardClicked(selpos) {
-	// If there's no chain of selected tiles
-	if (gameState.selectionChain.length == 0) {
-		// Clicking the selection does nothing
-		if (gameState.selection.x == selpos.x && gameState.selection.y == selpos.y) {
-			gameState.selection = selpos;
-			gameState.selectionChain = [];
-		}
-		// Clicking adjacent to the selection adds to the chain
-		else if (isAdjacent(selpos, gameState.selection)) {
-			gameState.selectionChain.push({x: selpos.x, y : selpos.y});
-		}
-		// Clicking elsewhere moves the selection
-		else {
-			gameState.selection = selpos;
-			gameState.selectionChain = [];
-		}
-	}
-	// If there is a chain of selected tiles
-	else {
-		// Clicking the selection kills the chain
-		if (gameState.selection.x == selpos.x && gameState.selection.y == selpos.y) {
-			gameState.selection = selpos;
-			gameState.selectionChain = [];
-		}
-		// If we didn't click on the selection, determine if we clicked on a tile in the chain
-		else
-		{
-			// Collision Handling
-			var collides = gameState.selectionCollides(selpos);
-			if (collides) {
-				while (gameState.selectionCollides(selpos)) {
-					gameState.popFromSelectionChain(1);
-				}
-				return;
-			}
+	// Helper vars:
+	var collides = gameState.selectionCollides(selpos);
+	var lenSelChain = gameState.selectionChain.length;
 
-			// No Collision
-			// If we clicked on the last member of the chain, determine if we can submit the word
-			if (isWord(selectedWord()) && selpos.x == gameState.selectionChain[gameState.selectionChain.length - 1].x && selpos.y == gameState.selectionChain[gameState.selectionChain.length - 1].y) {
-				showWord(selectedWord());
-				gameState.addSubmittedWord(selectedWord());
-				adjustGameboard();
-			}
-			// If we clicked adjacent the most recent member of the chain, add to it
-			else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
-				gameState.selectionChain.push({x: selpos.x, y : selpos.y});
-			}
-			// Otherwise, kill the chain and move the selection
-			else {
-				gameState.clearSelection();
-				gameState.selection = selpos;
-			}
-		}
+	// If empty chain:
+	if (gameState.selectionChain.length == 0) {
+		gameState.clearSelectionChain();
+		gameState.pushToSelectionChain(selpos);
+		return;
 	}
-	return;
+
+	// Collision Handling
+	else if (collides) {
+		while (gameState.selectionCollides(selpos)) {
+			gameState.popFromSelectionChain(1);
+		}
+		gameState.pushToSelectionChain(selpos);
+		return;
+	}
+
+	// If we clicked on the last member of the chain, determine if we can submit the word
+	else if (isWord(gameState.selectedWord()) &&
+		     selpos.x == gameState.selectionChain[lenSelChain - 1].x &&
+		     selpos.y == gameState.selectionChain[lenSelChain - 1].y) {
+		showWord(gameState.selectedWord());
+		gameState.addSubmittedWord(gameState.selectedWord());
+		adjustGameboard();
+		return;
+	}
+
+	// If we clicked adjacent the most recent member of the chain, add to it
+	else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
+		gameState.pushToSelectionChain({x: selpos.x, y : selpos.y});
+		return;
+	}
+
+	// Otherwise, kill the chain and move the selection
+	else {
+		gameState.clearSelectionChain();
+		gameState.pushToSelectionChain(selpos);
+		return;
+	}
 }
 
 // Main entry point after intial setup
@@ -218,9 +187,8 @@ function clickHandling(evt) {
 	// If we're on the gamemboard itself
 	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
 		boardClicked(selpos);
-	} else {
-		Globals.selection = {x: -9001, y: -9001};
 	}
+
 	renderBoard();
 }
 
@@ -250,7 +218,6 @@ function setup() {
 function GameState() {
 	// Variables with default initials
 	this.gameboard = [];
-	this.selection = {x: -9001, y: -9001};
 	this.selectionChain = [];
 	this.score = 0;
 	this.moveCounter = 0;
@@ -258,6 +225,13 @@ function GameState() {
 	this.wordQualityIndex = 0;
 
 	// Readonly Methods
+	this.selectedWord = function() {
+		var candidate = "";
+		for (var i = 0; i < this.selectionChain.length; i++){
+			candidate += this.gameboard[this.selectionChain[i].y][this.selectionChain[i].x];
+		}
+		return candidate;
+	}
 	this.selectionCollides = function(selpos) {
 		var collides = false;
 
@@ -273,6 +247,9 @@ function GameState() {
 	}
 
 	// Mutating Methods
+	this.pushToSelectionChain = function(coords) {
+		this.selectionChain.push(coords);
+	}
 	this.popFromSelectionChain = function(n) {
 		var k = this.selectionChain.length - n - 1;
 		for (var j = 0; j < k; j++){
@@ -280,8 +257,7 @@ function GameState() {
 		}
 	}
 
-	this.clearSelection = function() {
-		this.selection = {x: -9001, y: -9001};
+	this.clearSelectionChain = function() {
 		this.selectionChain = [];
 	}
 	this.shuffleBoard = function() {
