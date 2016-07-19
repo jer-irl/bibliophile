@@ -20,9 +20,9 @@ Yeah, it's written in JavaScript.
 ### Features Wishlist
 
 - Quadratic falling animation
-- Ban two-letter words
-- Weighted random character machine
-- Scoring procedure
+- ~~Ban two-letter words~~
+- ~~Weighted random character machine~~
+- ~~Scoring procedure~~
 - Display score, possibly previous words
 - Annoying mascot?
 - Bonus tiles
@@ -32,7 +32,7 @@ Yeah, it's written in JavaScript.
 
 ### Pedantry Wishlist
 
-- function scoreForWord(string) -> Int
+- ~~function scoreForWord(string) -> Int~~
 - Class Board
 	- Generate new
 	- reset after word input
