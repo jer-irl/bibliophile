@@ -2,61 +2,6 @@
 'use strict';
 
 
-// 8x7 array of initially random characters
-// we'll need some way to ensure that there's always a word on the board
-var gameboard = [];
-for (var j = 0; j < 8; j++) {
-	var row = new Array(7).fill(undefined).map(weightedChar);
-	gameboard.push(row);
-}
-
-var c = document.getElementById("myCanvas");
-var ctx = c.getContext("2d");
-var selection = {x : -9001, y : -9001};
-var selectionChain = [];
-
-
-function isAdjacent(a, b) {
-	/* returns true if adjacent
-	 *
-	 * Suppose a is in column 1. Then we have the following values for b:
-	 * - + -
-	 * + a +
-	 * + + +
-	 *
-	 * In column 2, we have:
-	 * + + +
-	 * + a +
-	 * - + -
-	 */
-
-	var columnSpecific;
-	if (a.x % 2 == 1) {
-		columnSpecific = (a.y == b.y - 1 && 1 == Math.abs(a.x - b.x));
-	} else {
-		columnSpecific = (a.y == b.y + 1 && 1 == Math.abs(a.x - b.x));
-	}
-
-	return ((a.x == b.x && 1 == Math.abs(a.y - b.y)) ||
-			(a.y == b.y && 1 == Math.abs(a.x - b.x)) ||
-			columnSpecific);
-}
-
-// Declare some constants
-const boardX = 10;
-const boardY = 10;
-const tileWidth = 50;
-const tileHeight = 50;
-const tileSpace = 3;
-
-function pickTile( x, y ) {
-	// Translates a board location to index in gameboard array
-	var i = Math.floor((x - boardX) / (tileWidth + tileSpace));
-	var j = Math.floor((y - (((tileHeight / 2) * (i % 2)) + boardY))
-	                   / (tileHeight + tileSpace));
-
-	return { x: i, y: j };
-}
 
 function drawTile (location, color) {
 	var x = location.x * (tileWidth + tileSpace) + boardX;
@@ -206,83 +151,112 @@ function getMousePos(canvas, evt) {
 	};
 }
 
-function clickResponse(evt) {
+function boardClicked(mousePos, selpos) {
+	// If there's no chain of selected tiles
+	if (selectionChain.length == 0) {
+		// Clicking the selection does nothing
+		if (selection.x == selpos.x && selection.y == selpos.y) {
+			selection = selpos;
+			selectionChain = [];
+		}
+		// Clicking adjacent to the selection adds to the chain
+		else if (isAdjacent(selpos, selection)) {
+			selectionChain.push({x: selpos.x, y : selpos.y});
+		}
+		// Clicking elsewhere moves the selection
+		else {
+			selection = selpos;
+			selectionChain = [];
+		}
+	}
+	// If there is a chain of selected tiles
+	else {
+		// Clicking the selection kills the chain
+		if (selection.x == selpos.x && selection.y == selpos.y) {
+			selection = selpos;
+			selectionChain = [];
+		}
+		// If we didn't click on the selection, determine if we clicked on a tile in the chain
+		else
+		{
+			var collides = false;
+
+			// For each tile, check
+			for (var i = 0; i < selectionChain.length - 1 && !collides; i++) {
+				// If we did hit it, delete from the chain all tiles ahead of the selected one
+				if (selpos.x == selectionChain[i].x && selpos.y == selectionChain[i].y) {
+					var k = selectionChain.length - i - 1;
+					for (j = 0; j < k; j++){
+						selectionChain.pop();
+					}
+					collides = true;
+				}
+			}
+
+			// If we didn't collide with the chain, proceed
+			if (!collides) {
+				// If we clicked on the last member of the chain, determine if we can submit the word
+				if (isWord(selectedWord()) && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
+					adjustGameboard();
+				}
+				// If we clicked adjacent the most recent member of the chain, add to it
+				else if (isAdjacent(selpos, selectionChain[selectionChain.length - 1])) {
+					selectionChain.push({x: selpos.x, y : selpos.y});
+				}
+				// Otherwise, kill the chain and move the selection
+				else {
+					selection = selpos;
+					selectionChain = [];
+				}
+			}
+		}
+	}
+	return;
+}
+
+function clickHandling(evt) {
 	var mousePos = getMousePos(c, evt);
 	var selpos = pickTile(mousePos.x, mousePos.y);
 	// If we're on the gamemboard itself
 	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
-		// If there's no chain of selected tiles
-		if (selectionChain.length == 0) {
-			// Clicking the selection does nothing
-			if (selection.x == selpos.x && selection.y == selpos.y) {
-				selection = selpos;
-				selectionChain = [];
-			}
-			// Clicking adjacent to the selection adds to the chain
-			else if (isAdjacent(selpos, selection)) {
-				selectionChain.push({x: selpos.x, y : selpos.y});
-			}
-			// Clicking elsewhere moves the selection
-			else {
-				selection = selpos;
-				selectionChain = [];
-			}
-		}
-		// If there is a chain of selected tiles
-		else {
-			// Clicking the selection kills the chain
-			if (selection.x == selpos.x && selection.y == selpos.y) {
-				selection = selpos;
-				selectionChain = [];
-			}
-			// If we didn't click on the selection, determine if we clicked on a tile in the chain
-			else
-			{
-				var collides = false;
-
-				// For each tile, check
-				for (var i = 0; i < selectionChain.length - 1 && !collides; i++) {
-					// If we did hit it, delete from the chain all tiles ahead of the selected one
-					if (selpos.x == selectionChain[i].x && selpos.y == selectionChain[i].y) {
-						var k = selectionChain.length - i - 1;
-						for (j = 0; j < k; j++){
-							selectionChain.pop();
-						}
-						collides = true;
-					}
-				}
-
-				// If we didn't collide with the chain, proceed
-				if (!collides) {
-					// If we clicked on the last member of the chain, determine if we can submit the word
-					if (isWord(selectedWord()) && selpos.x == selectionChain[selectionChain.length - 1].x && selpos.y == selectionChain[selectionChain.length - 1].y) {
-						adjustGameboard();
-					}
-					// If we clicked adjacent the most recent member of the chain, add to it
-					else if (isAdjacent(selpos, selectionChain[selectionChain.length - 1])) {
-						selectionChain.push({x: selpos.x, y : selpos.y});
-					}
-					// Otherwise, kill the chain and move the selection
-					else {
-						selection = selpos;
-						selectionChain = [];
-					}
-				}
-			}
-		}
-	}
-	// If we clicked outside the gameboard, then don't render a selected tile
-	else {
+		boardClicked(mousePos, selpos);
+	} else {
 		selection = {x: -9001, y: -9001};
 	}
+	renderBoard();
+}
+
+
+
+
+
+function main() {
+	// Init gameboard
+	var gameboard = [];
+	for (var j = 0; j < 8; j++) {
+		var row = new Array(7).fill(undefined).map(weightedChar);
+		gameboard.push(row);
+	}
+
+	var c = document.getElementById("myCanvas");
+	var ctx = c.getContext("2d");
+	var selection = {x : -9001, y : -9001};
+	var selectionChain = [];
+
+	// Declare some constants
+	const boardX = 10;
+	const boardY = 10;
+	const tileWidth = 50;
+	const tileHeight = 50;
+	const tileSpace = 3;
+
+	c.addEventListener('mouseup', clickHandling, false);
 
 	renderBoard();
 }
 
-c.addEventListener('mouseup', clickResponse, false);
 
 
-
-renderBoard();
+main();
 
 
