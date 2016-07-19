@@ -23,7 +23,7 @@ Yeah, it's written in JavaScript.
 - ~~Ban two-letter words~~
 - ~~Weighted random character machine~~
 - ~~Scoring procedure~~
-- Display score, possibly previous words
+- ~~Display score, possibly previous words~~
 - Annoying mascot?
 - Bonus tiles
 - Flame tiles

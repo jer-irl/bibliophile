@@ -203,6 +203,7 @@ function boardClicked(selpos) {
 				// If we clicked on the last member of the chain, determine if we can submit the word
 				if (isWord(selectedWord()) && selpos.x == Globals.selectionChain[Globals.selectionChain.length - 1].x && selpos.y == Globals.selectionChain[Globals.selectionChain.length - 1].y) {
 					Globals.score += baseWordScore(selectedWord());
+					showWord(selectedWord());
 					adjustGameboard();
 				}
 				// If we clicked adjacent the most recent member of the chain, add to it
@@ -220,6 +221,7 @@ function boardClicked(selpos) {
 	return;
 }
 
+// Main entry point after intial setup
 function clickHandling(evt) {
 	var mousePos = getMousePos(Globals.c, evt);
 	var selpos = pickTile(mousePos.x, mousePos.y);
@@ -248,6 +250,10 @@ var Globals = { gameboard: [],
 
 function showScore() {
 	document.getElementById("score").innerHTML = "Score: " + Globals.score;
+}
+
+function showWord(word) {
+	document.getElementById("words").innerHTML = word + "</br>" + document.getElementById("words").innerHTML
 }
 
 
