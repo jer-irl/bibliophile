@@ -1,53 +1,6 @@
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-function drawTile (location, color) {
-	var tileWidth = Globals.tileWidth;
-	var tileHeight = Globals.tileHeight;
-	var tileSpace = Globals.tileSpace;
-	var boardX = Globals.boardX;
-	var boardY = Globals.boardY;
-
-	var x = location.x * (tileWidth + tileSpace) + boardX;
-	var y = location.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (location.x % 2)) + boardY;
-	Globals.ctx.fillStyle=color;
-	Globals.ctx.fillRect(x, y, tileWidth, tileHeight);
-	Globals.ctx.font="35px Garamond";
-	Globals.ctx.fillStyle="#000000";
-	Globals.ctx.rect(x, y, tileWidth, tileHeight);
-	var text = Globals.ctx.measureText(gameState.gameboard[location.y][location.x]);
-	var xOffset = (tileWidth - text.width) / 2;
-	var yOffset = (tileHeight - text.height) / 2;
-
-	Globals.ctx.fillText(gameState.gameboard[location.y][location.x], x + xOffset, y + 35);
-}
-
-function renderBoard () {
-	Globals.ctx.fillStyle="#8F3931";
-	Globals.ctx.fillRect(0, 0, Globals.c.width, Globals.c.height);
-
-	// Draw a box with character for each tile
-	for (var j = 0; j < 8; j++) {
-		for (var i = 0; i < 7; i++) {
-			drawTile({x: i, y: j}, "#800000");
-		}
-	}
-
-	// Draw the selection chain (or don't if empty)
-	for (var i = 0; i < gameState.selectionChain.length; i++) {
-		// Special case for first to please James
-		if (i == 0) {
-			drawTile(gameState.selectionChain[0], "#FFA319");
-			continue;
-		}
-		// All non-first tiles:
-		drawTile(gameState.selectionChain[i], "#FFB547");
-	}
-
-	Globals.ctx.stroke();
-	showScore();
-}
-
 // Returns the index in the column of the next selected tile, and -1 if the column contains none
 function nextSelectedTileInColumn(i) {
 	var colIndex = -1;
@@ -64,16 +17,6 @@ function nextSelectedTileInColumn(i) {
 	return colIndex;
 }
 
-// Gets the index of the (i, j)th tile within the chain of selected tiles
-function getChainIndex(i, j) {
-	for (var k = 0; k < gameState.selectionChain.length; k++) {
-		if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
-			var chainIndex = k;
-			break;
-		}
-	}
-	return chainIndex;
-}
 
 function cleanUp(i, j) {
 	if (j > -1) {
@@ -126,15 +69,6 @@ function adjustGameboard() {
 	gameState.clearSelectionChain();
 }
 
-
-function getMousePos(canvas, evt) {
-	var rect = canvas.getBoundingClientRect();
-	return {
-		x: evt.clientX - rect.left,
-		y: evt.clientY - rect.top
-	};
-}
-
 function boardClicked(selpos) {
 	// Helper vars:
 	var collides = gameState.selectionCollides(selpos);
@@ -160,8 +94,14 @@ function boardClicked(selpos) {
 	else if (isWord(gameState.selectedWord()) &&
 		     selpos.x == gameState.selectionChain[lenSelChain - 1].x &&
 		     selpos.y == gameState.selectionChain[lenSelChain - 1].y) {
-		showWord(gameState.selectedWord());
+		// Update gameState
 		gameState.addSubmittedWord(gameState.selectedWord());
+
+		// Refresh page values
+		showWord(gameState.selectedWord());
+		showScore();
+
+		// Adjust the Gameboard
 		adjustGameboard();
 		return;
 	}
@@ -193,17 +133,10 @@ function clickHandling(evt) {
 }
 
 
-function showScore() {
-	document.getElementById("score").innerHTML = "Score: " + gameState.score;
-}
-
-function showWord(word) {
-	document.getElementById("words").innerHTML = word + "</br>" + document.getElementById("words").innerHTML
-}
 
 
 
-function setup() {
+function init() {
 	// Init c and ctx
 	Globals.c = document.getElementById("myCanvas");
 	Globals.ctx = Globals.c.getContext("2d");
@@ -215,72 +148,12 @@ function setup() {
 	renderBoard();
 }
 
-function GameState() {
-	// Variables with default initials
-	this.gameboard = [];
-	this.selectionChain = [];
-	this.score = 0;
-	this.moveCounter = 0;
-	this.submittedWords = [];
-	this.wordQualityIndex = 0;
-
-	// Readonly Methods
-	this.selectedWord = function() {
-		var candidate = "";
-		for (var i = 0; i < this.selectionChain.length; i++){
-			candidate += this.gameboard[this.selectionChain[i].y][this.selectionChain[i].x];
-		}
-		return candidate;
-	}
-	this.selectionCollides = function(selpos) {
-		var collides = false;
-
-		// For each tile, check
-		for (var i = 0; i < this.selectionChain.length - 1; i++) {
-			// If we did hit it, delete from the chain all tiles ahead of the selected one
-			if (selpos.x == this.selectionChain[i].x && selpos.y == this.selectionChain[i].y) {
-				collides = true;
-				break;
-			}
-		}
-		return collides;
-	}
-
-	// Mutating Methods
-	this.pushToSelectionChain = function(coords) {
-		this.selectionChain.push(coords);
-	}
-	this.popFromSelectionChain = function(n) {
-		var k = this.selectionChain.length - n - 1;
-		for (var j = 0; j < k; j++){
-			this.selectionChain.pop();
-		}
-	}
-
-	this.clearSelectionChain = function() {
-		this.selectionChain = [];
-	}
-	this.shuffleBoard = function() {
-		// TODO
-		return;
-	};
-	this.addSubmittedWord = function(word) {
-		this.submittedWords.push(word);
-		this.score += baseWordScore(word);
-		return;
-	}
-	this.initGameboard = function() {
-		for (var j = 0; j < 8; j++) {
-			var row = new Array(7).fill(undefined).map(weightedChar);
-			this.gameboard.push(row);
-		}
-		return;
-	}
-}
 
 
 
-// Global vars and Calls
+// Global vars and Calls: (entry points are generally from user clicking)
+// ----------------------------------------------------------------------------
+
 var Globals = {
                 c: undefined,
                 ctx: undefined,
@@ -291,6 +164,5 @@ var Globals = {
 				tileSpace: 3 }
 
 var gameState = new GameState();
-setup();
-
+init();
 
