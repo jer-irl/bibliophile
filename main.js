@@ -1,21 +1,12 @@
-
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
 
-// This and the following function allow us to generate random characters
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-// We'll want to weight this to keep things interesting, but it's unbiased right now
-function randchar() {
-	return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-}
-
 // 8x7 array of initially random characters
 // we'll need some way to ensure that there's always a word on the board
-var gameboard = new Array();
+var gameboard = [];
 for (var j = 0; j < 8; j++) {
-	var row = new Array(7).fill(undefined).map(randchar);
+	var row = new Array(7).fill(undefined).map(weightedChar);
 	gameboard.push(row);
 }
 
