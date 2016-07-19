@@ -46,6 +46,7 @@ function renderBoard () {
 	}
 
 	Globals.ctx.stroke();
+	showScore();
 }
 
 // Returns the index in the column of the next selected tile, and -1 if the column contains none
@@ -201,6 +202,7 @@ function boardClicked(selpos) {
 			if (!collides) {
 				// If we clicked on the last member of the chain, determine if we can submit the word
 				if (isWord(selectedWord()) && selpos.x == Globals.selectionChain[Globals.selectionChain.length - 1].x && selpos.y == Globals.selectionChain[Globals.selectionChain.length - 1].y) {
+					Globals.score += baseWordScore(selectedWord());
 					adjustGameboard();
 				}
 				// If we clicked adjacent the most recent member of the chain, add to it
@@ -225,7 +227,7 @@ function clickHandling(evt) {
 	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
 		boardClicked(selpos);
 	} else {
-		selection = {x: -9001, y: -9001};
+		Globals.selection = {x: -9001, y: -9001};
 	}
 	renderBoard();
 }
@@ -234,6 +236,7 @@ function clickHandling(evt) {
 var Globals = { gameboard: [],
                 c: undefined,
                 ctx: undefined,
+                score: 0,
                 selection: {x: -9001, y: -9001},
                 selectionChain: [],
 				boardX: 10,
@@ -242,6 +245,10 @@ var Globals = { gameboard: [],
 				tileHeight: 50,
 				tileSpace: 3 }
 
+
+function showScore() {
+	document.getElementById("score").innerHTML = "Score: " + Globals.score;
+}
 
 
 function setup() {

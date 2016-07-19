@@ -23,7 +23,7 @@ function baseWordScore(word) {
 
 	// Boggle part:
 	var bogglePart;
-	var wordLen = word.length;
+	var wordlen = word.length;
 	switch (wordlen) {
 		case 0:
 		case 1:
