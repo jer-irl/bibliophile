@@ -25,3 +25,16 @@ function isAdjacent(a, b) {
 			(a.y == b.y && 1 == Math.abs(a.x - b.x)) ||
 			columnSpecific);
 }
+
+// Gets the index of the (i, j)th tile within the chain of selected tiles
+function getChainIndex(i, j) {
+	for (var k = 0; k < gameState.selectionChain.length; k++) {
+		if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
+			var chainIndex = k;
+			break;
+		}
+	}
+	return chainIndex;
+}
+
+

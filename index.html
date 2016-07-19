@@ -6,16 +6,23 @@
     <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 
 	<!-- scoreForLetter(string), weightedChar(), randchar() -->
-	<script src="alphabet.js"></script>
+	<script src="src/alphabet.js"></script>
 
 	<!-- isWord(string), baseWordScore(string) -->
-	<script src="wordValidation.js"></script>
+	<script src="src/wordValidation.js"></script>
 
-	<!-- pickTile(x, y) -> indexes -->
-	<script src="UIHelpers.js"></script>
+	<!-- pickTile(x, y) -> indexes, getMousePos(canvas, evt) -->
+	<script src="src/UIHelpers.js"></script>
 
-	<!-- isAdjacent(a, b)  -->
-	<script src="modelHelpers.js"></script>
+	<!-- isAdjacent(a, b), getChainIndex(i, j)  -->
+	<script src="src/modelHelpers.js"></script>
+
+	<!-- showScore(), showWord(word), renderBoard(), drawTile(location, color) -->
+	<script src="src/viewHelpers.js"></script>
+
+	<!-- GameState().  Will add methods/properties when more complete -->
+	<script src="src/GameState.js"></script>
+
 </head>
 
 <body>
@@ -31,7 +38,7 @@
 		</div>
 	</div>
 
-	<script src="main.js"></script>
+	<script src="src/main.js"></script>
 
 	<h1 id="score">Score:</h1>
 
