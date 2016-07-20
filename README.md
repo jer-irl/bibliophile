@@ -14,6 +14,7 @@ Yeah, it's written in JavaScript.
 - CamelCase preferred
 - Semicolons everywhere
 - Otherwise, follow [airbnb's style guide](https://github.com/airbnb/javascript)
+- [JSDoc](http://usejsdoc.org) for documentation, with markdown.
 
 ## TODO
 

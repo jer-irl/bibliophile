@@ -1,7 +1,7 @@
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-// The dictionary lookup object
+// The dictionary lookup object, global so we don't repeatedly query
 var dict = {};
 $.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt ) {
 		// Get an array of all the words
@@ -13,11 +13,21 @@ $.get("https://rawgit.com/jeresch/bibliophile/develop/ospd.txt", function( txt )
 		}
 	});
 
+/**
+ * Determines whether a word is valid (in dict, and >2 letters)
+ * @param {String} Candidate word
+ * @returns {Boolean} result
+ */
 function isWord(candidate) {
 	return candidate.length > 2 &&
 		   dict[candidate.toLowerCase()];
 }
 
+/**
+ * Calculates the score for an input word, using Scrabble and Boggle logic
+ * @param {String} word
+ * @returns {Number} score
+ */
 function baseWordScore(word) {
 	// For now, following a combination of Scrabble and Boggle rules
 

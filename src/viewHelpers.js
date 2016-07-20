@@ -1,14 +1,23 @@
 'use strict'
 
-
+/**
+ * Updates the onscreen score to reflect the gameState score
+ */
 function showScore() {
 	document.getElementById("score").innerHTML = "Score: " + gameState.score;
 }
 
+/**
+ * Adds a word to the onscreen list
+ * @param {String} word to add
+ */
 function showWord(word) {
 	document.getElementById("words").innerHTML = word + "</br>" + document.getElementById("words").innerHTML
 }
 
+/**
+ * Renders the tiles on the board in their positions
+ */
 function renderBoard () {
 	Globals.ctx.fillStyle="#8F3931";
 	Globals.ctx.fillRect(0, 0, Globals.c.width, Globals.c.height);
@@ -34,7 +43,11 @@ function renderBoard () {
 	Globals.ctx.stroke();
 }
 
-
+/**
+ * Draw a single tile
+ * @param {Position} grid index
+ * @param {Color} fill color for tile
+ */
 function drawTile (location, color) {
 	var tileWidth = Globals.tileWidth;
 	var tileHeight = Globals.tileHeight;

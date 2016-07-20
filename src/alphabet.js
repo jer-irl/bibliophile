@@ -1,20 +1,25 @@
-// scoreForLetter(string) -> Scrabble value
-// randchar() -> String
-// weightedChar() -> String
-
-
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
 
 // Random Characters:
+// ----------------------------------------------------------------------------
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/**
+ * creates a string containing a random (capital) letter
+ * @returns {String}
+ */
 function randchar() {
 	return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
 }
 
+// Scores and Weights (Scrabble):
+// ----------------------------------------------------------------------------
 
-// I'm following the Scrabble scores and distributions
+/**
+ * contains the base letter score for each letter
+ */
 var letterScores = { A: 1,
                      B: 3,
                      C: 3,
@@ -42,6 +47,10 @@ var letterScores = { A: 1,
                      Y: 4,
                      Z: 10 }
 
+/**
+ * contains the relative number of this letter to spawn
+ * (taken from Scrabble)
+ */
 var letterDistrs = { A: 9,
                      B: 2,
                      C: 2,
@@ -70,15 +79,11 @@ var letterDistrs = { A: 9,
                      Z: 1 }
 
 
-// Construct virtual Scrabble pile
-var virtualPile = [];
-for (var i = 0; i < Object.keys(letterDistrs).length; i++) {
-	var letter = Object.keys(letterDistrs)[i];
-	var toAdd = Array(letterDistrs[letter]).fill(letter);
-	virtualPile = virtualPile.concat(toAdd);
-}
-
-
+/**
+ * Gives the base score for a letter
+ * @param {String} a single letter
+ * @returns {Number} score
+ */
 function scoreForLetter(lett) {
 	if (lett.toUpperCase() in letterScores) {
 		return letterScores[lett.toUpperCase()];
@@ -89,10 +94,18 @@ function scoreForLetter(lett) {
 }
 
 
+/**
+ * Gives a random character, weighted by the letterDistrs weights
+ * @returns {String} random character
+ */
 function weightedChar() {
+	// Construct virtual Scrabble pile
+	var virtualPile = [];
+	for (var i = 0; i < Object.keys(letterDistrs).length; i++) {
+		var letter = Object.keys(letterDistrs)[i];
+		var toAdd = Array(letterDistrs[letter]).fill(letter);
+		virtualPile = virtualPile.concat(toAdd);
+	}
 	return virtualPile[Math.floor(Math.random() * virtualPile.length)];
 }
-
-
-
 

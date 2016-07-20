@@ -1,7 +1,11 @@
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-// Returns the index in the column of the next selected tile, and -1 if the column contains none
+/**
+ * Returns the index in the column of the next selected tile, and -1 if the column contains none
+ * @param {Number} column index
+ * @returns {Number} result
+ */
 function nextSelectedTileInColumn(i) {
 	var colIndex = -1;
 
@@ -17,7 +21,9 @@ function nextSelectedTileInColumn(i) {
 	return colIndex;
 }
 
-
+/**
+ * Cleans up after gameboard adjustment
+ */
 function cleanUp(i, j) {
 	if (j > -1) {
 		var chainIndex = getChainIndex(i, j);
@@ -30,6 +36,9 @@ function cleanUp(i, j) {
 	}
 }
 
+/**
+ * Model changes in response to a sequence of tiles being accepted
+ */
 function adjustGameboard() {
 	// Get the list of columns hit by the chain
 	var columns = [false, false, false, false, false, false, false];
@@ -64,11 +73,14 @@ function adjustGameboard() {
 			}
 		}
 	}
-
 	// For good measure
 	gameState.clearSelectionChain();
 }
 
+/**
+ * Handles the logic for a selection of a tile on the board
+ * @param {Position} selection tile index
+ */
 function boardClicked(selpos) {
 	// Helper vars:
 	var collides = gameState.selectionCollides(selpos);
@@ -120,7 +132,9 @@ function boardClicked(selpos) {
 	}
 }
 
-// Main entry point after intial setup
+/**
+ * Switchboard for click events.  Main entry point after setup
+ */
 function clickHandling(evt) {
 	var mousePos = getMousePos(Globals.c, evt);
 	var selpos = pickTile(mousePos.x, mousePos.y);
@@ -128,14 +142,13 @@ function clickHandling(evt) {
 	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
 		boardClicked(selpos);
 	}
-
 	renderBoard();
 }
 
 
-
-
-
+/**
+ * Gives initial values to c, ctx, and gameState members.  Also renders board.
+ */
 function init() {
 	// Init c and ctx
 	Globals.c = document.getElementById("myCanvas");
@@ -147,8 +160,6 @@ function init() {
 
 	renderBoard();
 }
-
-
 
 
 // Global vars and Calls: (entry points are generally from user clicking)
