@@ -59,9 +59,10 @@ function adjustGameboard() {
 			// Move the column down as long as there remain instances of the chain in it
 			while (colIndex > -1) {
 				for (var jaz = colIndex; jaz > 0; jaz--) {
-					gameState.gameboard[jaz][iter] = gameState.gameboard[jaz - 1][iter];
+					gameState.gameboard[jaz - 1][iter].j += 1;
+					//gameState.gameboard[jaz][iter] = gameState.gameboard[jaz - 1][iter];
 				}
-				gameState.gameboard[0][iter] = weightedChar();
+				gameState.gameboard[0][iter].lett = weightedChar();
 
 				// Reset and look for another instance
 				colIndex = nextSelectedTileInColumn();
@@ -73,6 +74,31 @@ function adjustGameboard() {
 	}
 	// For good measure
 	gameState.clearSelectionChain();
+
+	// Animate the fall
+	var allInPlace = false;
+	while (!allInPlace) {
+		for (var jaz = 0; jaz < 8; jaz++){
+			for (var iter = 0; iter < 7; iter++) {
+				gameState.gameboard[jaz][iter].updateDisplayCoords();
+				gameState.gameboard[jaz][iter].drawTile("#800000");
+				if (gameState.gameboard[jaz][iter].y == gameState.gameboard[jaz][iter].coordToPlace().y) {
+					allInPlace = true;
+				}
+				renderBoard();
+				sleep(100);
+				console.log("hi");
+			}
+		}
+	}
+}
+
+function sleep(duration) {
+	var now = new Date().getTime();
+	while(new Date().getTime() < now + duration) {
+		// Chill
+	}
+	return;
 }
 
 /**
@@ -83,11 +109,12 @@ function boardClicked(selpos) {
 	// Helper vars:
 	var collides = gameState.selectionCollides(selpos);
 	var lenSelChain = gameState.selectionChain.length;
+	var tileToPush = gameState.gameboard[selpos.j][selpos.i];
 
 	// If empty chain:
 	if (gameState.selectionChain.length == 0) {
 		gameState.clearSelectionChain();
-		gameState.pushToSelectionChain(selpos);
+		gameState.pushToSelectionChain(tileToPush);
 		return;
 	}
 
@@ -96,7 +123,7 @@ function boardClicked(selpos) {
 		while (gameState.selectionCollides(selpos)) {
 			gameState.popFromSelectionChain(1);
 		}
-		gameState.pushToSelectionChain(selpos);
+		gameState.pushToSelectionChain(tileToPush);
 		return;
 	}
 
@@ -118,15 +145,14 @@ function boardClicked(selpos) {
 
 	// If we clicked adjacent the most recent member of the chain, add to it
 	else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
-		var toPush = new Position(selpos.i, selpos.j);
-		gameState.pushToSelectionChain(toPush);
+		gameState.pushToSelectionChain(tileToPush);
 		return;
 	}
 
 	// Otherwise, kill the chain and move the selection
 	else {
 		gameState.clearSelectionChain();
-		gameState.pushToSelectionChain(selpos);
+		gameState.pushToSelectionChain(tileToPush);
 		return;
 	}
 }
