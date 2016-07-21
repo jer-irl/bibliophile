@@ -6,15 +6,15 @@
  * @param {Number} column index
  * @returns {Number} result
  */
-function nextSelectedTileInColumn(i) {
+function nextSelectedTileInColumn(inCol) {
 	var colIndex = -1;
 
 	// For each column:
-	for (var j = 0; j < 8 && colIndex < 0; j++) {
+	for (var col = 0; col < 8 && colIndex < 0; col++) {
 		// Check if it's in the chain of selected tiles
 		for (var k = 0; k < gameState.selectionChain.length && colIndex < 0; k++) {
-			if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
-				colIndex = j;
+			if (gameState.selectionChain[k].i == inCol && gameState.selectionChain[k].j == col) {
+				colIndex = col;
 			}
 		}
 	}
@@ -43,33 +43,31 @@ function adjustGameboard() {
 	// Get the list of columns hit by the chain
 	var columns = [false, false, false, false, false, false, false];
 
-	for (var i = 0; i < gameState.selectionChain.length; i++) {
-		columns[gameState.selectionChain[i].x] = true;
+	for (var iter = 0; iter < gameState.selectionChain.length; iter++) {
+		columns[gameState.selectionChain[iter].i] = true;
 	}
 
 	// For each column
-	for (var i = 0; i < columns.length; i++) {
-		if (columns[i]) {
+	for (var iter = 0; iter < columns.length; iter++) {
+		if (columns[iter]) {
 			// Find the next instance in the column
-			var colIndex = nextSelectedTileInColumn(i);
+			var colIndex = nextSelectedTileInColumn(iter);
 
 			// If there's a selected tile in the column, remove it from the list of selected tiles
-			cleanUp(i,	colIndex);
+			cleanUp(iter, colIndex);
 
 			// Move the column down as long as there remain instances of the chain in it
 			while (colIndex > -1) {
-				for (var j = colIndex; j > 0; j--) {
-					//alert("Replacing " + gameboard[j][i] + " at (" + i + ", " + j + ") with " + gameboard[j - 1][i]);
-					gameState.gameboard[j][i] = gameState.gameboard[j - 1][i];
+				for (var jaz = colIndex; jaz > 0; jaz--) {
+					gameState.gameboard[jaz][iter] = gameState.gameboard[jaz - 1][iter];
 				}
-				gameState.gameboard[0][i] = weightedChar();
+				gameState.gameboard[0][iter] = weightedChar();
 
 				// Reset and look for another instance
 				colIndex = nextSelectedTileInColumn();
-				//alert("The next selected tile in the column is at index " + colIndex);
 
 				// If there's a selected tile in the column, remove it from the list of selected tiles
-				cleanUp(i, colIndex);
+				cleanUp(iter, colIndex);
 			}
 		}
 	}
@@ -104,8 +102,8 @@ function boardClicked(selpos) {
 
 	// If we clicked on the last member of the chain, determine if we can submit the word
 	else if (isWord(gameState.selectedWord()) &&
-		     selpos.x == gameState.selectionChain[lenSelChain - 1].x &&
-		     selpos.y == gameState.selectionChain[lenSelChain - 1].y) {
+		     selpos.i == gameState.selectionChain[lenSelChain - 1].i &&
+		     selpos.j == gameState.selectionChain[lenSelChain - 1].j) {
 		// Update gameState
 		gameState.addSubmittedWord(gameState.selectedWord());
 
@@ -120,7 +118,8 @@ function boardClicked(selpos) {
 
 	// If we clicked adjacent the most recent member of the chain, add to it
 	else if (isAdjacent(selpos, gameState.selectionChain[gameState.selectionChain.length - 1])) {
-		gameState.pushToSelectionChain({x: selpos.x, y : selpos.y});
+		var toPush = new Position(selpos.i, selpos.j);
+		gameState.pushToSelectionChain(toPush);
 		return;
 	}
 
@@ -139,7 +138,7 @@ function clickHandling(evt) {
 	var mousePos = getMousePos(Globals.c, evt);
 	var selpos = pickTile(mousePos.x, mousePos.y);
 	// If we're on the gamemboard itself
-	if (selpos.x < 7 && selpos.x > -1 && selpos.y < 8 && selpos.y > -1) {
+	if (selpos.i < 7 && selpos.i > -1 && selpos.j < 8 && selpos.j > -1) {
 		boardClicked(selpos);
 	}
 	renderBoard();

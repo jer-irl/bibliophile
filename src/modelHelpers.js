@@ -16,14 +16,14 @@
 function isAdjacent(a, b) {
 	// Logic specific to which column a is in
 	var columnSpecific;
-	if (a.x % 2 == 1) {
-		columnSpecific = (a.y == b.y - 1 && 1 == Math.abs(a.x - b.x));
+	if (a.i % 2 == 1) {
+		columnSpecific = (a.j == b.j - 1 && 1 == Math.abs(a.i - b.i));
 	} else {
-		columnSpecific = (a.y == b.y + 1 && 1 == Math.abs(a.x - b.x));
+		columnSpecific = (a.j == b.j + 1 && 1 == Math.abs(a.i - b.i));
 	}
 
-	return ((a.x == b.x && 1 == Math.abs(a.y - b.y)) ||
-			(a.y == b.y && 1 == Math.abs(a.x - b.x)) ||
+	return ((a.i == b.i && 1 == Math.abs(a.j - b.j)) ||
+			(a.j == b.j && 1 == Math.abs(a.i - b.i)) ||
 			columnSpecific);
 }
 
@@ -33,9 +33,9 @@ function isAdjacent(a, b) {
  * @param {Position} grid index
  * @returns {Number} index
  */
-function getChainIndex(i, j) {
+function getChainIndex(inI, inJ) {
 	for (var k = 0; k < gameState.selectionChain.length; k++) {
-		if (gameState.selectionChain[k].x == i && gameState.selectionChain[k].y == j) {
+		if (gameState.selectionChain[k].i == inI && gameState.selectionChain[k].j == inJ) {
 			var chainIndex = k;
 			break;
 		}

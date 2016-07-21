@@ -23,8 +23,8 @@ function GameState() {
 	 */
 	this.selectedWord = function() {
 		var candidate = "";
-		for (var i = 0; i < this.selectionChain.length; i++){
-			candidate += this.gameboard[this.selectionChain[i].y][this.selectionChain[i].x];
+		for (var iter = 0; iter < this.selectionChain.length; iter++){
+			candidate += this.gameboard[this.selectionChain[iter].j][this.selectionChain[iter].i];
 		}
 		return candidate;
 	}
@@ -38,9 +38,9 @@ function GameState() {
 		var collides = false;
 
 		// For each tile, check
-		for (var i = 0; i < this.selectionChain.length - 1; i++) {
+		for (var iter = 0; iter < this.selectionChain.length - 1; iter++) {
 			// If we did hit it, delete from the chain all tiles ahead of the selected one
-			if (selpos.x == this.selectionChain[i].x && selpos.y == this.selectionChain[i].y) {
+			if (selpos.i == this.selectionChain[iter].i && selpos.j == this.selectionChain[iter].j) {
 				collides = true;
 				break;
 			}

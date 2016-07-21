@@ -25,7 +25,8 @@ function renderBoard () {
 	// Draw a box with character for each tile
 	for (var j = 0; j < 8; j++) {
 		for (var i = 0; i < 7; i++) {
-			drawTile({x: i, y: j}, "#800000");
+			var pos = new Position(i, j);
+			drawTile(pos, "#800000");
 		}
 	}
 
@@ -48,24 +49,24 @@ function renderBoard () {
  * @param {Position} grid index
  * @param {Color} fill color for tile
  */
-function drawTile (location, color) {
+function drawTile (pos, color) {
 	var tileWidth = Globals.tileWidth;
 	var tileHeight = Globals.tileHeight;
 	var tileSpace = Globals.tileSpace;
 	var boardX = Globals.boardX;
 	var boardY = Globals.boardY;
 
-	var x = location.x * (tileWidth + tileSpace) + boardX;
-	var y = location.y * (tileHeight + tileSpace) + ((tileHeight / 2) * (location.x % 2)) + boardY;
+	var x = pos.i * (tileWidth + tileSpace) + boardX;
+	var y = pos.j * (tileHeight + tileSpace) + ((tileHeight / 2) * (pos.i % 2)) + boardY;
 	Globals.ctx.fillStyle=color;
 	Globals.ctx.fillRect(x, y, tileWidth, tileHeight);
 	Globals.ctx.font="35px Garamond";
 	Globals.ctx.fillStyle="#000000";
 	Globals.ctx.rect(x, y, tileWidth, tileHeight);
-	var text = Globals.ctx.measureText(gameState.gameboard[location.y][location.x]);
+	var text = Globals.ctx.measureText(gameState.gameboard[pos.j][pos.i]);
 	var xOffset = (tileWidth - text.width) / 2;
 	var yOffset = (tileHeight - text.height) / 2;
 
-	Globals.ctx.fillText(gameState.gameboard[location.y][location.x], x + xOffset, y + 35);
+	Globals.ctx.fillText(gameState.gameboard[pos.j][pos.i], x + xOffset, y + 35);
 }
 
