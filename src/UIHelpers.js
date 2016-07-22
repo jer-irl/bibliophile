@@ -3,7 +3,7 @@
 /** Translates a board location to index in gameboard array
  * @param {Number} the mouse x coord
  * @param {Number} the mouse y coord
- * @returns {Position} grid indexes
+ * @returns {Position} grid indices
  */
 function pickTile( x, y ) {
 	var theI = Math.floor((x - Globals.boardX) / (Globals.tileWidth + Globals.tileSpace));
