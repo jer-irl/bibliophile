@@ -1,96 +1,73 @@
 // Strict mode enforces cleaner syntax, scoping, etc.
 'use strict';
 
-/**
- * Returns the index in the column of the next selected tile, and -1 if the column contains none
- * @param {Number} column index
- * @returns {Number} result
- */
-function nextSelectedTileInColumn(inCol) {
-	var colIndex = -1;
-
-	// For each column:
-	for (var col = 0; col < 8 && colIndex < 0; col++) {
-		// Check if it's in the chain of selected tiles
-		for (var k = 0; k < gameState.selectionChain.length && colIndex < 0; k++) {
-			if (gameState.selectionChain[k].i == inCol && gameState.selectionChain[k].j == col) {
-				colIndex = col;
-			}
-		}
-	}
-	return colIndex;
-}
-
-/**
- * Cleans up after gameboard adjustment
- */
-function cleanUp(i, j) {
-	if (j > -1) {
-		var chainIndex = getChainIndex(i, j);
-		if (chainIndex > -1) {
-			gameState.selectionChain.splice(chainIndex, 1);
-		}
-		else {
-			gameState.clearSelectionChain();
-		}
-	}
-}
 
 /**
  * Model changes in response to a sequence of tiles being accepted
  */
 function adjustGameboard() {
-	// Get the list of columns hit by the chain
-	var columns = [false, false, false, false, false, false, false];
-
+	// Mark tiles for sliding
 	for (var iter = 0; iter < gameState.selectionChain.length; iter++) {
-		columns[gameState.selectionChain[iter].i] = true;
+		var tile = gameState.selectionChain[iter];
+		var colI = tile.i;
+		var rowJ = tile.j;
+		// Iterate up the column to the top, adding one to each tile's counter
+		for (var theRow = rowJ - 1; theRow > -1; theRow--) {
+			gameState.gameboard[theRow][colI].slideCounter += 1;
+		}
 	}
 
-	// For each column
-	for (var iter = 0; iter < columns.length; iter++) {
-		if (columns[iter]) {
-			// Find the next instance in the column
-			var colIndex = nextSelectedTileInColumn(iter);
+	// Show the deletion animations and delete from gameboard
+	for (var iter = 0; iter < gameState.selectionChain.length; iter++) {
+		var tile = gameState.selectionChain[iter];
+		tile.showDeletion();
+		gameState.gameboard[tile.j][tile.i] = null;
+	}
 
-			// If there's a selected tile in the column, remove it from the list of selected tiles
-			cleanUp(iter, colIndex);
+	// Slide all down
+	// Iterate from left to right, bottom to top
+	for (var row = 7; row > -1; row--) {
+		for (var col = 0; col < 7; col++) {
+			var tile = gameState.gameboard[row][col];
+			// If a null tile, continue and skip it
+			if (tile == null || tile.slideCounter == 0) {
+				continue;
+			}
 
-			// Move the column down as long as there remain instances of the chain in it
-			while (colIndex > -1) {
-				for (var jaz = colIndex; jaz > 0; jaz--) {
-					gameState.gameboard[jaz - 1][iter].j += 1;
-					//gameState.gameboard[jaz][iter] = gameState.gameboard[jaz - 1][iter];
-				}
-				gameState.gameboard[0][iter].lett = weightedChar();
+			var nToSlide = 0;
+			nToSlide = tile.slideCounter;
 
-				// Reset and look for another instance
-				colIndex = nextSelectedTileInColumn();
+			// Update gameboard
+			gameState.gameboard[row + nToSlide][col] = tile;
+			gameState.gameboard[row][col] = null;
 
-				// If there's a selected tile in the column, remove it from the list of selected tiles
-				cleanUp(iter, colIndex);
+			// Update tile
+			tile.j += nToSlide;
+			tile.showSlideDown(nToSlide);
+			tile.slideCounter = 0;
+			tile.x = tile.coordToPlace().x;
+			tile.y = tile.coordToPlace().y;
+		}
+	}
+
+	// Add in new tiles to replace nulls
+	// Iterate from left to right, bottom to top.
+	for (var row = 7; row > -1; row--) {
+		for (var col = 0; col < 7; col++) {
+			if (gameState.gameboard[row][col] == null) {
+				var theNewTile = new Tile(col, row, weightedChar());
+				gameState.gameboard[row][col] = theNewTile;
 			}
 		}
 	}
-	// For good measure
+
+
+	// Clean selectionChain
 	gameState.clearSelectionChain();
 
-	// Animate the fall
-	var allInPlace = false;
-	while (!allInPlace) {
-		for (var jaz = 0; jaz < 8; jaz++){
-			for (var iter = 0; iter < 7; iter++) {
-				gameState.gameboard[jaz][iter].updateDisplayCoords();
-				gameState.gameboard[jaz][iter].drawTile("#800000");
-				if (gameState.gameboard[jaz][iter].y == gameState.gameboard[jaz][iter].coordToPlace().y) {
-					allInPlace = true;
-				}
-				renderBoard();
-				sleep(100);
-				console.log("hi");
-			}
-		}
-	}
+
+	// Render again for now
+	renderBoard();
 }
 
 function sleep(duration) {
