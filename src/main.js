@@ -43,10 +43,10 @@ function adjustGameboard() {
 
 			// Update tile
 			tile.j += nToSlide;
-			tile.showSlideDown(nToSlide);
+			//tile.showSlideDown(nToSlide);
 			tile.slideCounter = 0;
-			tile.x = tile.coordToPlace().x;
-			tile.y = tile.coordToPlace().y;
+			//tile.x = tile.coordToPlace().x;
+			//tile.y = tile.coordToPlace().y;
 		}
 	}
 
@@ -64,10 +64,6 @@ function adjustGameboard() {
 
 	// Clean selectionChain
 	gameState.clearSelectionChain();
-
-
-	// Render again for now
-	renderBoard();
 }
 
 function sleep(duration) {
@@ -160,7 +156,8 @@ function init() {
 
 	Globals.c.addEventListener('mouseup', clickHandling, false);
 
-	renderBoard();
+	// Begin Render Loop
+	setInterval(renderBoard, 30);
 }
 
 

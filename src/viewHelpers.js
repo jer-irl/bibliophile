@@ -41,6 +41,5 @@ function renderBoard () {
 	}
 
 	Globals.ctx.stroke();
-	console.log(gameState.toString());
 }
 

@@ -65,15 +65,6 @@ Tile.prototype.neighbor = function(direc) {
 
 // Drawing Methods
 
-/**
- * Slides down by n
- */
-Tile.prototype.showSlideDown = function(n) {
-	console.log("Not implemented");
-	return;
-}
-
-
 Tile.prototype.updateDisplayCoords = function() {
 	// If already happily in place, do nothing
 	if (this.x == this.coordToPlace().x &&
@@ -105,6 +96,9 @@ Tile.prototype.coordToPlace = function() {
  * @param {Color} fill color for tile
  */
 Tile.prototype.drawTile = function(color) {
+	// If not in place, update coords
+	this.updateDisplayCoords();
+
 	Globals.ctx.fillStyle=color;
 	Globals.ctx.fillRect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
 	Globals.ctx.font="35px Garamond";
