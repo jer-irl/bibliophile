@@ -14,6 +14,9 @@ function Tile(theI, theJ, theLett) {
 
 	// Counter for the sliding down
 	this.slideCounter = 0;
+
+	// Tile Status
+	this.status = TileStates.Normal;
 }
 
 
@@ -93,21 +96,53 @@ Tile.prototype.coordToPlace = function() {
 /**
  * Draw a single tile
  * @param {Position} grid index
- * @param {Color} fill color for tile
  */
-Tile.prototype.drawTile = function(color) {
+Tile.prototype.drawTile = function() {
 	// If not in place, update coords
 	this.updateDisplayCoords();
 
+	// Get color depending on state
+	var color;
+	switch (this.status) {
+	case TileStates.Normal:
+		color = "#99FFCC";
+		break;
+	case TileStates.Burning:
+		color = "#FF0000";
+		break;
+	case TileStates.WillBurn:
+		color = "#FF6600";
+		break;
+	case TileStates.BonusX2:
+		color = "#669900";
+		break;
+	case TileStates.BonusX3:
+		color = "#0033CC";
+		break;
+	default:
+		throw "Invalid Tile Status for" + this.toString();
+		break;
+	}
+
+	// Override color if selected
+	var indexInSelectionChain = gameState.selectionChain.indexOf(this);
+	if (indexInSelectionChain > 0) {
+		color = "#FFB547";
+	} else if (indexInSelectionChain == 0) {
+		color = "#FFA319";
+	}
+
+	// Draw tile
 	Globals.ctx.fillStyle=color;
 	Globals.ctx.fillRect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
-	Globals.ctx.font="35px Garamond";
 	Globals.ctx.fillStyle="#000000";
 	Globals.ctx.strokeRect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
+
+	// Draw Text
+	Globals.ctx.font="35px Garamond";
 	var text = Globals.ctx.measureText(gameState.gameboard[this.j][this.i].lett);
 	var xOffset = (Globals.tileWidth - text.width) / 2;
 	var yOffset = (Globals.tileHeight - text.height) / 2;
-
 	Globals.ctx.fillText(gameState.gameboard[this.j][this.i].lett, this.x + xOffset, this.y + 35);
 }
 

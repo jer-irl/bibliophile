@@ -173,6 +173,14 @@ var Globals = {
 				tileHeight: 50,
 				tileSpace: 3 }
 
+var TileStates = {
+                  Normal: 0,
+				  Burning: 1,
+				  WillBurn: 2,
+				  BonusX2: 3,
+				  BonusX3: 4
+			     }
+
 var gameState = new GameState();
 init();
 

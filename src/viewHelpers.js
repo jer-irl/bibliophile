@@ -19,26 +19,16 @@ function showWord(word) {
  * Renders the tiles on the board in their positions
  */
 function renderBoard () {
+	// Make Board
 	Globals.ctx.clearRect(0, 0, Globals.c.width, Globals.c.height);
-	Globals.ctx.fillStyle="#8F3931";
+	Globals.ctx.fillStyle="#FFFF99";
 	Globals.ctx.fillRect(0, 0, Globals.c.width, Globals.c.height);
 
 	// Draw each tile
 	for (var j = 0; j < 8; j++) {
 		for (var i = 0; i < 7; i++) {
-			gameState.gameboard[j][i].drawTile("#800000");
+			gameState.gameboard[j][i].drawTile();
 		}
-	}
-
-	// Draw the selection chain (or don't if empty)
-	for (var i = 0; i < gameState.selectionChain.length; i++) {
-		// Special case for first to please James
-		if (i == 0) {
-			gameState.selectionChain[0].drawTile("#FFA319");
-			continue;
-		}
-		// All non-first tiles:
-		gameState.selectionChain[i].drawTile("#FFB547");
 	}
 
 	Globals.ctx.stroke();
