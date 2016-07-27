@@ -19,10 +19,11 @@ function showWord(word) {
  * Renders the tiles on the board in their positions
  */
 function renderBoard () {
+	Globals.ctx.clearRect(0, 0, Globals.c.width, Globals.c.height);
 	Globals.ctx.fillStyle="#8F3931";
 	Globals.ctx.fillRect(0, 0, Globals.c.width, Globals.c.height);
 
-	// Draw a box with character for each tile
+	// Draw each tile
 	for (var j = 0; j < 8; j++) {
 		for (var i = 0; i < 7; i++) {
 			gameState.gameboard[j][i].drawTile("#800000");
@@ -41,5 +42,6 @@ function renderBoard () {
 	}
 
 	Globals.ctx.stroke();
+	window.requestAnimationFrame(renderBoard);
 }
 

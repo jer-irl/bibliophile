@@ -68,7 +68,7 @@ Tile.prototype.neighbor = function(direc) {
 Tile.prototype.updateDisplayCoords = function() {
 	// If already happily in place, do nothing
 	if (this.x == this.coordToPlace().x &&
-		this.y == this.coordToPlace().y) {
+	    this.y == this.coordToPlace().y) {
 		return;
 	}
 	// Else, move y one down

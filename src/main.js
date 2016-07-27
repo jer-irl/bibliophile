@@ -157,7 +157,7 @@ function init() {
 	Globals.c.addEventListener('mouseup', clickHandling, false);
 
 	// Begin Render Loop
-	setInterval(renderBoard, 30);
+	renderBoard();
 }
 
 

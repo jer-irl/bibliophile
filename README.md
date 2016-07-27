@@ -34,6 +34,7 @@ Yeah, it's written in JavaScript.
 ### Pedantry Wishlist
 
 - ~~function scoreForWord(string) -> Int~~
+- Centralized animation queue
 - Class Board
 	- Generate new
 	- reset after word input
