@@ -108,7 +108,7 @@ function boardClicked(selpos) {
 		gameState.addSubmittedWord(gameState.selectedWord());
 
 		// Refresh page values
-		showWord(gameState.selectedWord());
+		showSubmittedWords();
 		showScore();
 
 		// Adjust the Gameboard
