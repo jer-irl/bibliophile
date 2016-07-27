@@ -103,7 +103,7 @@ Tile.prototype.drawTile = function(color) {
 	Globals.ctx.fillRect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
 	Globals.ctx.font="35px Garamond";
 	Globals.ctx.fillStyle="#000000";
-	Globals.ctx.rect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
+	Globals.ctx.strokeRect(this.x, this.y, Globals.tileWidth, Globals.tileHeight);
 	var text = Globals.ctx.measureText(gameState.gameboard[this.j][this.i].lett);
 	var xOffset = (Globals.tileWidth - text.width) / 2;
 	var yOffset = (Globals.tileHeight - text.height) / 2;
