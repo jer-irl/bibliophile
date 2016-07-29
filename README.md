@@ -30,12 +30,16 @@ Yeah, it's written in JavaScript.
 - Flame tiles
 - Frivolous animations
 - Non-pixelly fullscreen mode
+- Welcome Menu
+- Game Saving
+- Score adding shows word score
+- Scrolling word list
 
 ### Pedantry Wishlist
 
 - ~~function scoreForWord(string) -> Int~~
 - Centralized animation queue
-- Class Board
-	- Generate new
-	- reset after word input
+- ~~Class Board~~
+	- ~~Generate new~~
+	- ~~reset after word input~~
 - Assets
