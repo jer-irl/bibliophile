@@ -34,6 +34,7 @@ Yeah, it's written in JavaScript.
 - Game Saving
 - Score adding shows word score
 - Scrolling word list
+- Show letter value for each tile
 
 ### Pedantry Wishlist
 

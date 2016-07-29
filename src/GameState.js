@@ -34,8 +34,34 @@ function GameState() {
 // Readonly Methods:
 // ---------------------------------------------------------------------------
 
-GameState.prototype.updateTileStatusPool = function() {
-	console.log("not implemented");
+/**
+ * Depending on the quality of the inputted word, change tile status pool
+ * @param {word} added word
+ * @returns {null}
+ */
+GameState.prototype.updateTileStatusPool = function(word) {
+	// TODO: balance
+	// Pushing
+	var scoreForWord = baseWordScore(word);
+	if (scoreForWord < 5) {
+		this.tileStatusPool.push(TileStates.Burning);
+		this.tileStatusPool.push(TileStates.Burning);
+	} else if (scoreForWord < 10) {
+		this.tileStatusPool.push(TileStates.Burning);
+	} else if (scoreForWord < 20) {
+		this.tileStatusPool.push(TileStates.BonusX2);
+		this.tileStatusPool.push(TileStates.BonusX2);
+	} else {
+		this.tileStatusPool.push(TileStates.BonusX3);
+		this.tileStatusPool.push(TileStates.BonusX3);
+		this.tileStatusPool.push(TileStates.BonusX2);
+		this.tileStatusPool.push(TileStates.BonusX2);
+	}
+
+	// If too long, drop from front
+	if (this.tileStatusPool.length > 300) {
+		this.tileStatusPool.splice(0, 30);
+	}
 
 	return;
 }
@@ -114,7 +140,7 @@ GameState.prototype.shuffleBoard = function() {
 GameState.prototype.addSubmittedWord = function(word) {
 	this.submittedWords.push(word);
 	this.score += baseWordScore(word);
-	this.updateTileStatusPool();
+	this.updateTileStatusPool(word);
 	return;
 }
 
