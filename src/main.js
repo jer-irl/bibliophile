@@ -62,7 +62,6 @@ function adjustGameboard() {
 		}
 	}
 
-
 	// Clean selectionChain
 	gameState.clearSelectionChain();
 }

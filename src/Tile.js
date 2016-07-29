@@ -17,7 +17,6 @@ function Tile(theI, theJ, theLett, theStatus) {
 
 	// Tile Status
 	this.tileStatus = theStatus;
-
 }
 
 

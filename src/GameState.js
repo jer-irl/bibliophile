@@ -34,37 +34,36 @@ function GameState() {
 // Readonly Methods:
 // ---------------------------------------------------------------------------
 
-/**
- * Depending on the quality of the inputted word, change tile status pool
- * @param {word} added word
- * @returns {null}
- */
-GameState.prototype.updateTileStatusPool = function(word) {
-	// TODO: balance
-	// Pushing
-	var scoreForWord = baseWordScore(word);
-	if (scoreForWord < 5) {
-		this.tileStatusPool.push(TileStates.Burning);
-		this.tileStatusPool.push(TileStates.Burning);
-	} else if (scoreForWord < 10) {
-		this.tileStatusPool.push(TileStates.Burning);
-	} else if (scoreForWord < 20) {
-		this.tileStatusPool.push(TileStates.BonusX2);
-		this.tileStatusPool.push(TileStates.BonusX2);
-	} else {
-		this.tileStatusPool.push(TileStates.BonusX3);
-		this.tileStatusPool.push(TileStates.BonusX3);
-		this.tileStatusPool.push(TileStates.BonusX2);
-		this.tileStatusPool.push(TileStates.BonusX2);
+GameState.prototype.scoreForSelection = function() {
+	var score = 0;
+
+	// Word
+	score += baseWordScore(this.selectedWord());
+
+	// Special tiles
+	for (var i = 0; i < this.selectionChain.length; i++) {
+		var tileStatus = this.selectionChain[i].tileStatus;
+		switch (tileStatus) {
+			case TileStates.BonusX2:
+				console.log("Double score bonus");
+				score *= 2;
+				break;
+			case TileStates.BonusX3:
+				console.log("Triple score bonus");
+				score *= 3;
+				break;
+			case TileStates.Normal:
+			case TileStates.Burning:
+			case TileStates.WillBurn:
+				break;
+			default:
+				throw "Unhandled TileState";
+		}
 	}
 
-	// If too long, drop from front
-	if (this.tileStatusPool.length > 300) {
-		this.tileStatusPool.splice(0, 30);
-	}
-
-	return;
+	return score;
 }
+
 
 /**
  * Returns the selected word from the chain of the gamestate
@@ -99,6 +98,38 @@ GameState.prototype.selectionCollides = function(selpos) {
 
 // Mutating Methods:
 // ---------------------------------------------------------------------------
+
+/**
+ * Depending on the quality of the inputted word, change tile status pool
+ * @param {word} added word
+ * @returns {null}
+ */
+GameState.prototype.updateTileStatusPool = function(word) {
+	// TODO: balance
+	// Pushing
+	var scoreForWord = baseWordScore(word);
+	if (scoreForWord < 5) {
+		this.tileStatusPool.push(TileStates.Burning);
+		this.tileStatusPool.push(TileStates.Burning);
+	} else if (scoreForWord < 10) {
+		this.tileStatusPool.push(TileStates.Burning);
+	} else if (scoreForWord < 20) {
+		this.tileStatusPool.push(TileStates.BonusX2);
+		this.tileStatusPool.push(TileStates.BonusX2);
+	} else {
+		this.tileStatusPool.push(TileStates.BonusX3);
+		this.tileStatusPool.push(TileStates.BonusX3);
+		this.tileStatusPool.push(TileStates.BonusX2);
+		this.tileStatusPool.push(TileStates.BonusX2);
+	}
+
+	// If too long, drop from front
+	if (this.tileStatusPool.length > 300) {
+		this.tileStatusPool.splice(0, 30);
+	}
+
+	return;
+}
 
 /**
  * Pushes a selection to the selection chain
@@ -139,7 +170,7 @@ GameState.prototype.shuffleBoard = function() {
  */
 GameState.prototype.addSubmittedWord = function(word) {
 	this.submittedWords.push(word);
-	this.score += baseWordScore(word);
+	this.score += this.scoreForSelection();
 	this.updateTileStatusPool(word);
 	return;
 }

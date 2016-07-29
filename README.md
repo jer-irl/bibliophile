@@ -26,7 +26,7 @@ Yeah, it's written in JavaScript.
 - ~~Scoring procedure~~
 - ~~Display score, possibly previous words~~
 - Annoying mascot?
-- Bonus tiles
+- ~~Bonus tiles~~
 - Flame tiles
 - Frivolous animations
 - Non-pixelly fullscreen mode
