@@ -55,7 +55,8 @@ function adjustGameboard() {
 	for (var row = 7; row > -1; row--) {
 		for (var col = 0; col < 7; col++) {
 			if (gameState.gameboard[row][col] == null) {
-				var theNewTile = new Tile(col, row, weightedChar());
+				var newState = gameState.tileStatusPool[Math.floor(Math.random() * gameState.tileStatusPool.length)];
+				var theNewTile = new Tile(col, row, weightedChar(), newState);
 				gameState.gameboard[row][col] = theNewTile;
 			}
 		}

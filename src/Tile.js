@@ -1,6 +1,6 @@
 'use strict';
 
-function Tile(theI, theJ, theLett) {
+function Tile(theI, theJ, theLett, theStatus) {
 	// Indexes for grid
 	this.i = theI;
 	this.j = theJ;
@@ -16,7 +16,8 @@ function Tile(theI, theJ, theLett) {
 	this.slideCounter = 0;
 
 	// Tile Status
-	this.status = TileStates.Normal;
+	this.tileStatus = theStatus;
+
 }
 
 
@@ -103,7 +104,7 @@ Tile.prototype.drawTile = function() {
 
 	// Get color depending on state
 	var color;
-	switch (this.status) {
+	switch (this.tileStatus) {
 	case TileStates.Normal:
 		color = "#99FFCC";
 		break;
@@ -158,7 +159,7 @@ Tile.prototype.toString = function() {
 	var out = "";
 	out += "Tile(i: " + this.i + ", ";
 	out += "j: " + this.j + ", ";
-	out += "lett: " + this.lett + ")\n";
+	out += "lett: " + this.lett + ", " + this.tileStatus + ")\n";
 	return out;
 }
 

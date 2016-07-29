@@ -13,11 +13,32 @@ function GameState() {
 	this.submittedWords = [];
 	this.wordQualityIndex = 0;
 
+	/**
+	 * tileStatusPool is a dynamically updated pool from which a status is pulled when making a new tile
+	 */
+	// Initial values
+	var numNormal = 100;
+	var numBurning = 0;
+	var numWillBurn = 0; // Should always be zero
+	var BonusX2 = 1;
+	var BonusX3 = 0;
+
+	// Add values, it's gross, I know
+	this.tileStatusPool = Array(numNormal).fill(TileStates.Normal, 0, numNormal - 1);
+	this.tileStatusPool.push(TileStates.BonusX2);
+
+
 }
 
 
 // Readonly Methods:
 // ---------------------------------------------------------------------------
+
+GameState.prototype.updateTileStatusPool = function() {
+	console.log("not implemented");
+
+	return;
+}
 
 /**
  * Returns the selected word from the chain of the gamestate
@@ -93,6 +114,7 @@ GameState.prototype.shuffleBoard = function() {
 GameState.prototype.addSubmittedWord = function(word) {
 	this.submittedWords.push(word);
 	this.score += baseWordScore(word);
+	this.updateTileStatusPool();
 	return;
 }
 
@@ -103,7 +125,7 @@ GameState.prototype.initGameboard = function() {
 	for (var j = 0; j < 8; j++) {
 		this.gameboard.push([]);
 		for (var i = 0; i < 7; i++) {
-			var tileToPush = new Tile(i, j, weightedChar());
+			var tileToPush = new Tile(i, j, weightedChar(), TileStates.Normal);
 			this.gameboard[j].push(tileToPush);
 		}
 	}
