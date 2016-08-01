@@ -25,7 +25,7 @@ Yeah, it's written in JavaScript.
 - ~~Weighted random character machine~~
 - ~~Scoring procedure~~
 - ~~Display score, possibly previous words~~
-- Annoying mascot?
+- ~~Annoying mascot?~~
 - ~~Bonus tiles~~
 - Flame tiles
 - Frivolous animations
