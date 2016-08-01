@@ -36,6 +36,7 @@ Yeah, it's written in JavaScript.
 - ~~Bonus tiles~~
 - ~~Score adding shows word score~~
 - ~~Show letter value for each tile~~
+- Overshooting catching for tiles, then snap to grid
 
 ### Known Bugs
 
