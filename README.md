@@ -39,7 +39,8 @@ Yeah, it's written in JavaScript.
 
 ### Known Bugs
 
-- After several word entries, tile selection gets laggy
+- ~~After several word entries, tile selection gets laggy~~
+- Randomly kills most of the tiles on the screen, exception with tileStatus undefined
 
 ### Pedantry Wishlist
 
