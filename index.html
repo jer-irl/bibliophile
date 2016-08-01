@@ -20,6 +20,12 @@
 	<!-- showScore(), showWord(word), renderBoard(), drawTile(location, color) -->
 	<script src="src/viewHelpers.js"></script>
 
+	<!-- Position(i, j). oo object for positions, not widely adopted -->
+	<script src="src/Position.js"></script>
+
+	<!-- Tile(i, j) -->
+	<script src="src/Tile.js"></script>
+
 	<!-- GameState().  Will add methods/properties when more complete -->
 	<script src="src/GameState.js"></script>
 
@@ -36,11 +42,15 @@
 			<b>Words: </b> </br>
 			<p id="words"></p>
 		</div>
+		<div">
+			<img src="http://vignette2.wikia.nocookie.net/nintendo/images/5/5e/SnakeB.jpg/revision/latest?cb=20080902230231&path-prefix=en" alt="Annoying Mascot" height="400px">
+		</div>
 	</div>
 
 	<script src="src/main.js"></script>
 
 	<h1 id="score">Score:</h1>
+	<button type="button" name="Shuffle Board" onclick="gameState.shuffleBoard()">Shuffle Board</button>
 
 </body>
 </html>
