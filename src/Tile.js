@@ -21,6 +21,7 @@ function Tile(theI, theJ, theLett, theStatus) {
 	this.tileStatus = theStatus;
 
 	this.animationStatus = TileAnimationStatus.None;
+	this.speed = 0;
 }
 
 
@@ -73,35 +74,51 @@ Tile.prototype.neighbor = function(direc) {
 // Drawing Methods
 
 Tile.prototype.updateDisplayCoords = function() {
+	// Get locals
+	var xToPlace = this.coordToPlace().x;
+	var yToPlace = this.coordToPlace().y;
+
+	// Check if Correctly Placed
+	if (this.animationStatus != TileAnimationStatus.None &&
+		this.x == xToPlace &&
+		this.y == yToPlace) {
+		this.animationStatus = TileAnimationStatus.None;
+		this.speed = 0;
+		console.log("Correctly Placed: ", this.toString());
+		return;
+	}
+	// Snap to grid if close
+	else if (this.animationStatus != TileAnimationStatus.None &&
+		     Math.abs(this.x - xToPlace) < 10 &&
+	         Math.abs(this.y - yToPlace) < 10) {
+		this.x = xToPlace;
+		this.y = yToPlace;
+		this.animationStatus = TileAnimationStatus.None;
+		this.speed = 0;
+	}
+
+	// For animation:
+	var distance = Math.sqrt(Math.pow((this.y - yToPlace), 2) + Math.pow((this.x - xToPlace), 2));
+
+	// Speed updates
 	switch (this.animationStatus) {
 		case TileAnimationStatus.None:
 			break;
 		case TileAnimationStatus.Falling:
-			// If already happily in place, do nothing
-			if (this.x == this.coordToPlace().x &&
-				this.y == this.coordToPlace().y) {
-				this.animationStatus = TileAnimationStatus.None
-				break;
-			}
-			// Else, move y one down
-			else {
-				this.y += 1;
-				break;
-			}
+			this.speed = (distance > 20) ? 1 : 0.3;
+			break;
 		case TileAnimationStatus.Shuffled:
-			if (this.x == this.coordToPlace().x &&
-				this.y == this.coordToPlace().y) {
-				this.animationStatus = TileAnimationStatus.None;
-				break;
-			} else {
-				var distance = Math.sqrt(Math.pow((this.y - this.coordToPlace().y), 2) + Math.pow((this.x - this.coordToPlace().x), 2));
-
-				this.x += (this.coordToPlace().x - this.x) / distance;
-				this.y += (this.coordToPlace().y - this.y) / distance;
-				break;
-			}
+			this.speed = (distance > 20) ? this.speed + 0.1 : 0.3;
+			break;
 	}
-	renderBoard;
+
+	// Actual movement
+	if (this.animationStatus != TileAnimationStatus.None) {
+		this.x += this.speed * ((xToPlace - this.x) / distance);
+		this.y += this.speed * ((yToPlace - this.y) / distance);
+	}
+
+	return;
 }
 
 Tile.prototype.coordToPlace = function() {
