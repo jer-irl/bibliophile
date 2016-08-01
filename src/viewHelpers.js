@@ -15,6 +15,8 @@ function showSubmittedWords() {
 	var outList = '';
 	for (var i = gameState.submittedWords.length - 1; i > -1; i--) {
 		outList += gameState.submittedWords[i];
+		outList += " ";
+		outList += baseWordScore(gameState.submittedWords[i]);
 		outList += "</br>";
 	}
 	document.getElementById("words").innerHTML = outList;

@@ -32,7 +32,7 @@ Yeah, it's written in JavaScript.
 - Non-pixelly fullscreen mode
 - Welcome Menu
 - Game Saving
-- Score adding shows word score
+- ~~Score adding shows word score~~
 - Scrolling word list
 - ~~Show letter value for each tilei~~
 
