@@ -20,7 +20,7 @@ Yeah, it's written in JavaScript.
 
 ### Features Wishlist
 
-- Quadratic falling animation
+- ~~Quadratic falling animation~~
 - ~~Ban two-letter words~~
 - ~~Weighted random character machine~~
 - ~~Scoring procedure~~
