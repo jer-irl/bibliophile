@@ -26,6 +26,9 @@ function showSubmittedWords() {
  * Renders the tiles on the board in their positions
  */
 function renderBoard () {
+	// Log
+	console.log("renderBoard() called");
+
 	// Make Board
 	Globals.ctx.clearRect(0, 0, Globals.c.width, Globals.c.height);
 	Globals.ctx.fillStyle="#FFFF99";
@@ -39,6 +42,17 @@ function renderBoard () {
 	}
 
 	Globals.ctx.stroke();
-	window.requestAnimationFrame(renderBoard);
+
+	// Check if still queued animations
+	for (var j = 0; j < 8; j++) {
+		for (var i = 0; i < 7; i++) {
+			if (gameState.gameboard[j][i].animationStatus != TileAnimationStatus.None) {
+				window.requestAnimationFrame(renderBoard);
+				return;
+			}
+		}
+	}
+	// Else
+	return;
 }
 
