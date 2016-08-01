@@ -1,5 +1,7 @@
 'use strict';
 
+var TileAnimationStatus = { None: 0, Shuffled: 1, Falling: 2 }
+
 function Tile(theI, theJ, theLett, theStatus) {
 	// Indexes for grid
 	this.i = theI;
@@ -17,6 +19,8 @@ function Tile(theI, theJ, theLett, theStatus) {
 
 	// Tile Status
 	this.tileStatus = theStatus;
+
+	this.animationStatus = TileAnimationStatus.None;
 }
 
 
@@ -69,16 +73,35 @@ Tile.prototype.neighbor = function(direc) {
 // Drawing Methods
 
 Tile.prototype.updateDisplayCoords = function() {
-	// If already happily in place, do nothing
-	if (this.x == this.coordToPlace().x &&
-	    this.y == this.coordToPlace().y) {
-		return;
+	switch (this.animationStatus) {
+		case TileAnimationStatus.None:
+			break;
+		case TileAnimationStatus.Falling:
+			// If already happily in place, do nothing
+			if (this.x == this.coordToPlace().x &&
+				this.y == this.coordToPlace().y) {
+				this.animationStatus = TileAnimationStatus.None
+				break;
+			}
+			// Else, move y one down
+			else {
+				this.y += 1;
+				break;
+			}
+		case TileAnimationStatus.Shuffled:
+			if (this.x == this.coordToPlace().x &&
+				this.y == this.coordToPlace().y) {
+				this.animationStatus = TileAnimationStatus.None;
+				break;
+			} else {
+				var distance = Math.sqrt(Math.pow((this.y - this.coordToPlace().y), 2) + Math.pow((this.x - this.coordToPlace().x), 2));
+
+				this.x += (this.coordToPlace().x - this.x) / distance;
+				this.y += (this.coordToPlace().y - this.y) / distance;
+				break;
+			}
 	}
-	// Else, move y one down
-	else {
-		this.y += 1;
-		return;
-	}
+	renderBoard;
 }
 
 Tile.prototype.coordToPlace = function() {

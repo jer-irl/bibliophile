@@ -14,6 +14,7 @@ function adjustGameboard() {
 		// Iterate up the column to the top, adding one to each tile's counter
 		for (var theRow = rowJ - 1; theRow > -1; theRow--) {
 			gameState.gameboard[theRow][colI].slideCounter += 1;
+			gameState.gameboard[theRow][colI].animationStatus = TileAnimationStatus.Falling;
 		}
 	}
 
@@ -175,11 +176,11 @@ var Globals = {
 
 var TileStates = {
                   Normal: 0,
-				  Burning: 1,
-				  WillBurn: 2,
-				  BonusX2: 3,
-				  BonusX3: 4
-			     }
+                  Burning: 1,
+                  WillBurn: 2,
+                  BonusX2: 3,
+                  BonusX3: 4
+                 }
 
 var gameState = new GameState();
 init();

@@ -158,11 +158,36 @@ GameState.prototype.clearSelectionChain = function() {
 	this.selectionChain = [];
 }
 
-// TODO
 GameState.prototype.shuffleBoard = function() {
-	throw "Not implemented";
+	console.log("Shuffling Board");
+	// Get tiles
+	var tiles = [];
+	for (var i = 0; i < 8; i++) {
+		for (var j = 0; j < 7; j++) {
+			tiles.push(this.gameboard[i][j]);
+		}
+	}
+	
+	// Place each into gameboard
+	for (var i = 0; i < 7; i++) {
+		for (var j = 0; j < 8; j++) {
+			var rand = Math.floor(Math.random() * tiles.length);
+			this.gameboard[j][i] = tiles[rand];
+			this.gameboard[j][i].i = i;
+			this.gameboard[j][i].j = j;
+			this.gameboard[j][i].animationStatus = TileAnimationStatus.Shuffled;
+			tiles.splice(rand, 1);
+		}
+	}
+
+	// Push bad statuses to pool
+	for (var i = 0; i < 6; i++) {
+		this.tileStatusPool.push(TileStates.Burning);
+	}
+
+	renderBoard();
 	return;
-};
+}
 
 /**
  * Adds the input word to the list of submitted words, and to the score
