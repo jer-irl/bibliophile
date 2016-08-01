@@ -140,10 +140,18 @@ Tile.prototype.drawTile = function() {
 
 	// Draw Text
 	Globals.ctx.font="35px Garamond";
-	var text = Globals.ctx.measureText(gameState.gameboard[this.j][this.i].lett);
+	var text = Globals.ctx.measureText(this.lett);
 	var xOffset = (Globals.tileWidth - text.width) / 2;
 	var yOffset = (Globals.tileHeight - text.height) / 2;
-	Globals.ctx.fillText(gameState.gameboard[this.j][this.i].lett, this.x + xOffset, this.y + 35);
+	Globals.ctx.fillText(this.lett, this.x + xOffset, this.y + 35);
+
+	// Draw letter score
+	Globals.ctx.font = "18px Garamond";
+	Globals.ctx.fillStyle = '#666666';
+	var text = Globals.ctx.measureText(letterScores[this.lett]);
+	var xOffset = Globals.tileWidth - text.width - 5;
+	var yOffset = text.height + 5;
+	Globals.ctx.fillText(letterScores[this.lett], this.x + xOffset, this.y + 15);
 }
 
 Tile.prototype.showDeletion = function() {
