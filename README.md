@@ -20,21 +20,26 @@ Yeah, it's written in JavaScript.
 
 ### Features Wishlist
 
-- ~~Quadratic falling animation~~
+- Make bonus tiles multiply tile score
+- Quadratic falling animation (that doesn't lag out)
+- Flame tiles
+- Frivolous animations
+- Non-pixelly fullscreen mode
+- Welcome Menu
+- Game Saving
+- Scrolling word list
 - ~~Ban two-letter words~~
 - ~~Weighted random character machine~~
 - ~~Scoring procedure~~
 - ~~Display score, possibly previous words~~
 - ~~Annoying mascot?~~
 - ~~Bonus tiles~~
-- Flame tiles
-- Frivolous animations
-- Non-pixelly fullscreen mode
-- Welcome Menu
-- Game Saving
 - ~~Score adding shows word score~~
-- Scrolling word list
-- ~~Show letter value for each tilei~~
+- ~~Show letter value for each tile~~
+
+### Known Bugs
+
+- After several word entries, tile selection gets laggy
 
 ### Pedantry Wishlist
 
