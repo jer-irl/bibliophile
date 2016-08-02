@@ -73,24 +73,21 @@ Tile.prototype.neighbor = function(direc) {
 
 // Drawing Methods
 
+Tile.prototype.snap = function() {
+	this.x = this.coordToPlace().x;
+	this.y = this.coordToPlace().y;
+	return;
+}
+
 Tile.prototype.updateDisplayCoords = function() {
 	// Get locals
 	var xToPlace = this.coordToPlace().x;
 	var yToPlace = this.coordToPlace().y;
 
-	// Check if Correctly Placed
-	if (this.animationStatus != TileAnimationStatus.None &&
-		this.x == xToPlace &&
-		this.y == yToPlace) {
-		this.animationStatus = TileAnimationStatus.None;
-		this.speed = 0;
-		console.log("Correctly Placed: ", this.toString());
-		return;
-	}
 	// Snap to grid if close
-	else if (this.animationStatus != TileAnimationStatus.None &&
-		     Math.abs(this.x - xToPlace) < 10 &&
-	         Math.abs(this.y - yToPlace) < 10) {
+	if (this.animationStatus != TileAnimationStatus.None &&
+		     Math.abs(this.x - xToPlace) < 3 &&
+	         Math.abs(this.y - yToPlace) < 3) {
 		this.x = xToPlace;
 		this.y = yToPlace;
 		this.animationStatus = TileAnimationStatus.None;
@@ -105,17 +102,28 @@ Tile.prototype.updateDisplayCoords = function() {
 		case TileAnimationStatus.None:
 			break;
 		case TileAnimationStatus.Falling:
-			this.speed = (distance > 20) ? 1 : 0.3;
-			break;
 		case TileAnimationStatus.Shuffled:
-			this.speed = (distance > 20) ? this.speed + 0.1 : 0.3;
+			this.speed += 0.05;
 			break;
 	}
 
 	// Actual movement
 	if (this.animationStatus != TileAnimationStatus.None) {
-		this.x += this.speed * ((xToPlace - this.x) / distance);
-		this.y += this.speed * ((yToPlace - this.y) / distance);
+		var movementX = this.speed * ((xToPlace - this.x) / distance);
+		var movementY = this.speed * ((yToPlace - this.y) / distance);
+		var candX = this.x + movementX;
+		var candY = this.y + movementY;
+
+		// Catch if past
+		if ((movementX > 0 && candX > xToPlace) ||
+		    (movementX < 0 && candX < xToPlace) ||
+			(movementY > 0 && candY > yToPlace) ||
+			(movementY < 0 && candY < yToPlace)) {
+			this.snap()
+		} else {
+			this.x += this.speed * ((xToPlace - this.x) / distance);
+			this.y += this.speed * ((yToPlace - this.y) / distance);
+		}
 	}
 
 	return;
